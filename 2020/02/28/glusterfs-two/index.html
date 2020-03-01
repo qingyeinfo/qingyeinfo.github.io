@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html  lang="zh">
+<head>
+    <meta charset="utf-8">
+<title>GlusterFS集群文件系统专题二(主要术语) - qingye&#39;s blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+
+
+    <meta name="description" content="1.Trusted Storage  Pool 一堆存储节点的集合 通过一个节点“邀请”其他节点创建，这里叫probe 成员可以动态加入，动态删除添加命令如下：node1# gluster peer probe node2删除命令如下：node1# gluster peer detach node3   2.Bricks Brick是一个节点和一个导出目录的集合，e.g. node1:&#x2F;brick">
+<meta name="keywords" content="linux,glusterfs,centos">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GlusterFS集群文件系统专题二(主要术语)">
+<meta property="og:url" content="http:&#x2F;&#x2F;qingye.info&#x2F;2020&#x2F;02&#x2F;28&#x2F;glusterfs-two&#x2F;index.html">
+<meta property="og:site_name" content="qingye&#39;s blog">
+<meta property="og:description" content="1.Trusted Storage  Pool 一堆存储节点的集合 通过一个节点“邀请”其他节点创建，这里叫probe 成员可以动态加入，动态删除添加命令如下：node1# gluster peer probe node2删除命令如下：node1# gluster peer detach node3   2.Bricks Brick是一个节点和一个导出目录的集合，e.g. node1:&#x2F;brick">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;qingye.info&#x2F;images&#x2F;og_image.png">
+<meta property="og:updated_time" content="2020-02-28T15:01:25.189Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;qingye.info&#x2F;images&#x2F;og_image.png">
+
+
+
+
+
+<link rel="alternative" href="/atom.xml" title="GlusterFS集群文件系统专题二(主要术语)" type="application/atom+xml">
+
+
+
+<link rel="icon" href="/images/favicon.ico">
+
+
+<link rel="stylesheet" href="https://unpkg.com/bulma@0.7.2/css/bulma.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,600|Source+Code+Pro">
+<link rel="stylesheet" href="https://unpkg.com/highlight.js@9.12.0/styles/atom-one-dark.css">
+
+
+    
+    
+    
+    <style>body>.footer,body>.navbar,body>.section{opacity:0}</style>
+    
+
+    
+    
+    
+    <link rel="stylesheet" href="https://unpkg.com/lightgallery@1.6.8/dist/css/lightgallery.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css">
+    
+
+    
+    
+
+<link rel="stylesheet" href="https://unpkg.com/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.css">
+
+
+    
+    
+    
+    
+
+<link rel="stylesheet" href="/css/back-to-top.css">
+
+
+    
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-118599694-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-118599694-1');
+</script>
+
+
+    
+    
+<script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?f58a5db01159bcd69ce92836dd9bbbb2";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/css/progressbar.css">
+<script src="https://unpkg.com/pace-js@1.0.2/pace.min.js"></script>
+
+    
+    
+    
+
+    
+    
+    
+        <script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+
+    
+    
+    
+        <script type="text/javascript" src="https://js.users.51.la/20079919.js"></script>
+    
+
+    
+    
+    
+        <script>
+            (function(){
+                var bp = document.createElement('script');
+                var curProtocol = window.location.protocol.split(':')[0];
+                if (curProtocol === 'https'){
+               bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+              }
+              else{
+              bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+              }
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(bp, s);
+            })();
+            </script>
+    
+
+    
+    
+    
+        <script>
+            (function(){
+            var src = (document.location.protocol == "http:") ? "http://js.passport.qihucdn.com/11.0.1.js?428f95ddc1f1e1d2fe658679fcd2092b":"https://jspassport.ssl.qhimg.com/11.0.1.js?428f95ddc1f1e1d2fe658679fcd2092b";
+            document.write('<script src="' + src + '" id="sozz"><\/script>');
+            })();
+        </script>
+    
+
+    
+
+
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="is-2-column">
+    <nav class="navbar navbar-main">
+    <div class="container">
+        <div class="navbar-brand is-flex-center">
+            <a class="navbar-item navbar-logo" href="/">
+            
+                <img src="/images/logo.svg" alt="GlusterFS集群文件系统专题二(主要术语)" height="28">
+            
+            </a>
+        </div>
+        <div class="navbar-menu">
+            
+            <div class="navbar-start">
+                
+                <a class="navbar-item"
+                href="/">首页</a>
+                
+                <a class="navbar-item"
+                href="/archives/">归档</a>
+                
+                <a class="navbar-item"
+                href="/categories">分类</a>
+                
+                <a class="navbar-item"
+                href="/tags">标签</a>
+                
+                <a class="navbar-item"
+                href="/about">关于</a>
+                
+            </div>
+            
+            <div class="navbar-end">
+                
+                    
+                    
+                    <a class="navbar-item" target="_blank" title="Download on GitHub" href="https://github.com/qingyeinfo">
+                        
+                        <i class="fab fa-github"></i>
+                        
+                    </a>
+                    
+                
+                
+                
+                <a class="navbar-item search" title="搜索" href="javascript:;" target="_blank" rel="noopener">
+                    <i class="fas fa-search"></i>
+                </a>
+                
+            </div>
+        </div>
+    </div>
+</nav>
+    
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-8-tablet is-9-desktop is-9-widescreen has-order-2 column-main"><div class="card">
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2020-02-28T14:51:30.000Z">2020-02-28</time>
+                
+                <div class="level-item">
+                <a class="has-link-grey -link" href="/categories/glusterfs/">glusterfs</a>
+                </div>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    8 分钟 读完 (大约 1249 个字)
+                </span>
+                
+                
+                <span class="level-item has-text-grey" id="busuanzi_container_page_pv">
+                    <i class="far fa-eye"></i>
+                    <span id="busuanzi_value_page_pv">0</span>次访问
+                </span>
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                GlusterFS集群文件系统专题二(主要术语)
+            
+        </h1>
+        <div class="content">
+            <h3 id="1-Trusted-Storage-Pool"><a href="#1-Trusted-Storage-Pool" class="headerlink" title="1.Trusted Storage  Pool"></a><em>1.Trusted Storage  Pool</em></h3><ul>
+<li>一堆存储节点的集合</li>
+<li>通过一个节点“邀请”其他节点创建，这里叫probe</li>
+<li>成员可以动态加入，动态删除<br>添加命令如下：<br>node1# gluster peer probe node2<br>删除命令如下：<br>node1# gluster peer detach node3</li>
+</ul>
+<p><img src="https://cloud.qingye.info/images/20200226/glusterfs2_1.png" alt="图1 GlusterFS存储池"></p>
+<h3 id="2-Bricks"><a href="#2-Bricks" class="headerlink" title="2.Bricks"></a><em>2.Bricks</em></h3><ul>
+<li>Brick是一个节点和一个导出目录的集合，e.g. node1:/brick1</li>
+<li>Brick是底层的RAID或磁盘经XFS或ext4文件系统格式化而来，所以继承了文件系统的限制</li>
+<li>每个节点上的brick数是不限的</li>
+<li>理想的状况是，一个集群的所有Brick大小都一样<a id="more"></a>
+<img src="https://cloud.qingye.info/images/20200226/glusterfs2_2.png" alt="图2 GlusterFS Bricks"></li>
+</ul>
+<h3 id="3-Volumes"><a href="#3-Volumes" class="headerlink" title="3.Volumes"></a><em>3.Volumes</em></h3><ul>
+<li>Volume是brick的逻辑组合</li>
+<li>创建时命名来识别</li>
+<li>Volume是一个可挂载的目录</li>
+<li>每个节点上的brick数是不变的,e.g.mount –t glusterfs <a href="http://www.std.com:test" target="_blank" rel="noopener">www.std.com:test</a> /mnt/gls</li>
+<li>一个节点上的不同brick可以属于不同的卷</li>
+<li>支持如下种类：<br>a) 分布式卷<br>b) 条带卷<br>c) 复制卷<br>d) 分布式复制卷<br>e) 条带复制卷<br>f) 分布式条带复制卷</li>
+</ul>
+<h4 id="3-1-分布式卷"><a href="#3-1-分布式卷" class="headerlink" title="3.1 分布式卷"></a><em>3.1 分布式卷</em></h4><ul>
+<li>文件分布存在不同的brick里</li>
+<li>目录在每个brick里都可见</li>
+<li>单个brick失效会带来数据丢失</li>
+<li>无需额外元数据服务器</li>
+</ul>
+<p>gluster是没有元数据服务器的，它定位文件和寻址都是通过哈希算法，这里使用的叫Davies-Meyer hash algorithm，可寻址空间为2^32次方，即0-4294967296，例如这里有四个节点，那么0-1073741824为node1的可寻址空间，1073741825-214748348为node2的可寻址空间，以此类推。访问一个文件时，通过文件名计算出一个地址，例如2142011129，属于1073741825-214748348，则将它存在node2中。</p>
+<p>分布式卷内部的hash分布如下：</p>
+<p><img src="https://cloud.qingye.info/images/20200226/glusterfs2_3.png" alt="图3 GlusterFS 分布式卷内部的hash分布"></p>
+<p>分布式卷的读写如下图所示:</p>
+<p><img src="https://cloud.qingye.info/images/20200226/glusterfs2_7.png" alt="图4 GlusterFS 分布式卷"></p>
+<h3 id="3-2-复制卷"><a href="#3-2-复制卷" class="headerlink" title="3.2 复制卷"></a><em>3.2 复制卷</em></h3><ul>
+<li>同步复制所有的目录和文件</li>
+<li>节点故障时保持数据高可用</li>
+<li>事务性操作，保持一致性</li>
+<li>有changelog</li>
+<li>副本数任意定</li>
+</ul>
+<p>复制卷的读写如下图所示：</p>
+<p><img src="https://cloud.qingye.info/images/20200226/glusterfs2_4.jpg" alt="图5 GlusterFS 复制卷"></p>
+<h3 id="3-3条带卷"><a href="#3-3条带卷" class="headerlink" title="3.3条带卷"></a><em>3.3条带卷</em></h3><ul>
+<li>文件切分成一个个的chunk，存放于不同的brick上</li>
+<li>只建议在非常大的文件时使用（比硬盘大小还大）</li>
+<li>Brick故障会导致数据丢失，建议和复制卷同时使用</li>
+<li>Chunks are files with holes – this helps in maintaining offset consistency</li>
+</ul>
+<p><img src="https://cloud.qingye.info/images/20200226/glusterfs2_9.png" alt="图6 GlusterFS 条带卷"></p>
+<h3 id="3-3条带复制卷"><a href="#3-3条带复制卷" class="headerlink" title="3.3条带复制卷"></a><em>3.3条带复制卷</em></h3><ul>
+<li>数据将进行切片，切片在复本卷内进行复制，在不同卷间进行分布</li>
+</ul>
+<p><img src="https://cloud.qingye.info/images/20200226/glusterfs2_6.png" alt="图7 GlusterFS 条带复制卷"></p>
+<h3 id="3-3分布式复制卷"><a href="#3-3分布式复制卷" class="headerlink" title="3.3分布式复制卷"></a><em>3.3分布式复制卷</em></h3><ul>
+<li>最常见的一种模式</li>
+<li>读操作可以做到负载均衡</li>
+<li>复本卷的组成依赖于指定brick的顺序，brick必须为复本数K的N倍,brick列表将以K个为一组，形成N个复本卷</li>
+</ul>
+<p><img src="https://cloud.qingye.info/images/20200226/glusterfs2_5.jpg" alt="图8 GlusterFS 分布式复制卷"></p>
+<h3 id="3-4分布式条带复制卷"><a href="#3-4分布式条带复制卷" class="headerlink" title="3.4分布式条带复制卷"></a><em>3.4分布式条带复制卷</em></h3><ul>
+<li>bricks数量为stripe个数N，和repl个数M的积N*M的整数倍</li>
+<li>exp1 exp2 exp3 exp4组成一个分布卷，exp1和exp2组成一个stripe卷，exp3和exp4组成另一个stripe卷，1和2，3和4互为复本卷，exp4-exp8组成另一个分布卷</li>
+</ul>
+<p><img src="https://cloud.qingye.info/images/20200226/glusterfs2_8.png" alt="图9 GlusterFS 分布式条带复制卷"></p>
+<h3 id="4-其他术语"><a href="#4-其他术语" class="headerlink" title="4.其他术语"></a><em>4.其他术语</em></h3><ul>
+<li>Client:挂载了GFS卷的设备</li>
+<li>Extended Attributes:xattr:是一个文件系统的特性,其支持用户或程序关联文件/目录和元数据。</li>
+<li>FUSE:Filesystem Userspace,是一个可加载的内核模块，其支持非特权用户创建自己的文件系统而不需要修改内核代码,通过在用户空间运行文件系统的代码通过FUSE代码与内核进行桥接</li>
+<li>Geo-Replication：异地备份，提供了一种持续，异步，增量数据备份策略，可以通过局域网，广域网，英特网来进行</li>
+<li>GFID:GFS卷中的每个文件或目录都有一个唯一的128位的数据相关联，其用于模拟inode</li>
+<li>Namespace:每个Gluster卷都导出单个ns作为POSIX的挂载点</li>
+<li>Node:一个拥有若干brick的设备</li>
+<li>RDMA:远程直接内存访问,支持不通过双方的OS进行直接内存访问</li>
+<li>RRDNS:round robin DNS是一种通过DNS轮转返回不同的设备以进行负载均衡的方法</li>
+<li>Self-heal:用于后台运行检测复本卷中文件和目录的不一致性并解决这些不一致</li>
+<li>Split-brain:脑裂</li>
+<li>Volfile:glusterfs进程的配置文件,通常位于/var/lib/glusterd/vols/volname</li>
+<li>Volume:一组bricks的逻辑集合</li>
+</ul>
+
+        </div>
+        
+        <div class="level is-size-7 is-uppercase">
+            <div class="level-start">
+                <div class="level-item">
+                    <span class="is-size-6 has-text-grey has-mr-7">#</span>
+                    <a class="has-link-grey -link" href="/tags/centos/" rel="tag">centos</a>, <a class="has-link-grey -link" href="/tags/glusterfs/" rel="tag">glusterfs</a>, <a class="has-link-grey -link" href="/tags/linux/" rel="tag">linux</a>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <div class="social-share"></div>
+<link rel="stylesheet" href="https://unpkg.com/social-share.js@1.0.16/dist/css/share.min.css">
+<script src="https://unpkg.com/social-share.js@1.0.16/dist/js/social-share.min.js"></script>
+        
+    </div>
+</div>
+
+
+
+
+
+<div class="card card-transparent">
+    <div class="level post-navigation is-flex-wrap is-mobile">
+        
+        
+        <div class="level-end">
+            <a class="level level-item has-link-grey  article-nav-next" href="/2020/02/25/glusterfs-one/">
+                <span class="level-item">GlusterFS集群文件系统专题一(基础原理)</span>
+                <i class="level-item fas fa-chevron-right"></i>
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+
+
+<div class="card">
+    <div class="card-content">
+        <h3 class="title is-5 has-text-weight-normal">评论</h3>
+        
+<div id="valine-thread" class="content"></div>
+<script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.15.0/dist/av-min.js"></script>
+<script src='//unpkg.com/valine@1.3.9/dist/Valine.min.js'></script>
+<script>
+    new Valine({
+        el: '#valine-thread' ,
+        notify: false,
+        verify: false,
+        app_id: '9j93r3FqeWzjXbi3nuwAwDCD-gzGzoHsz',
+        app_key: 'fUjLlCkl3zfE6aFKSN3pbeNn',
+        placeholder: '发表您的意见，让我们一起交流，共同提高吧...'
+    });   
+</script>
+
+    </div>
+</div>
+</div>
+                
+
+
+
+
+<div class="column is-4-tablet is-3-desktop is-3-widescreen  has-order-1 column-left is-sticky">
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <nav class="level">
+            <div class="level-item has-text-centered">
+                <div>
+                    
+                        <img id="blog-head-img" class="image is-128x128 has-mb-6" src="/images/avatar.png" alt="青叶的博客">
+                    
+                    
+                    <p class="is-size-5 is-block" style="margin-top: 10px;">
+                        青叶的博客
+                    </p>
+                    
+                    
+                    <p class="is-size-6 is-block" style="margin-top: 5px;">
+                        Do Something...
+                    </p>
+                    
+                    
+                    <p class="is-size-6 is-flex is-flex-center has-text-grey" style="margin-top: 5px;">
+                        <i class="fas fa-map-marker-alt has-mr-7"></i>
+                        <span>&nbsp;&nbsp;广东 . 深圳</span>
+                    </p>
+                    
+                </div>
+            </div>
+        </nav>
+        <nav class="level is-mobile">
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        文章
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        7
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        分类
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        5
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        标签
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        11
+                    </p>
+                </div>
+            </div>
+        </nav>
+        <div id="knowledge-star">
+            <div class="level">
+                <a class="level-item button is-link is-rounded" href="http://cloud.qingye.info/images/20191105/weixinggongzhonghao.png" target="_blank">
+                    关注博主微信公众号</a>
+            </div>
+            <div clas="level" id="knowledge-qrcode" style="display:none;">
+                    <img src="/images/zhishixingqiu.png"/>
+            </div>
+        </div>
+        
+        
+        <div class="level is-mobile">
+            
+            <a class="level-item button is-white is-marginless" target="_blank"
+                title="Github" href="https://github.com/qingyeinfo">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank"
+                title="Email" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&amp;email=qingyeinfo@gmail.com">
+                
+                <i class="fa fa-envelope"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank"
+                title="RSS" href="/atom.xml">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+            
+        </div>
+        
+    </div>
+</div>
+    
+        
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            最新文章
+        </h3>
+        
+        <article class="media">
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-02-28T14:51:30.000Z">2020-02-28</time></div>
+                    <a href="/2020/02/28/glusterfs-two/" class="has-link-black-ter is-size-6">GlusterFS集群文件系统专题二(主要术语)</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/glusterfs/">glusterfs</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-02-25T15:20:56.000Z">2020-02-25</time></div>
+                    <a href="/2020/02/25/glusterfs-one/" class="has-link-black-ter is-size-6">GlusterFS集群文件系统专题一(基础原理)</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/glusterfs/">glusterfs</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-02-23T15:36:41.000Z">2020-02-23</time></div>
+                    <a href="/2020/02/23/ntp-server/" class="has-link-black-ter is-size-6">ntp-server服务端部署和配置</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/ntp/">ntp</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-01-14T15:15:45.000Z">2020-01-14</time></div>
+                    <a href="/2020/01/14/yum-source/" class="has-link-black-ter is-size-6">YUM源部署和使用</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/yum/">yum</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-01-14T14:37:30.000Z">2020-01-14</time></div>
+                    <a href="/2020/01/14/rkhunter/" class="has-link-black-ter is-size-6">rkhunter安装和使用</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/rkhunter/">rkhunter</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+    </div>
+</div>
+
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            归档
+        </h3>
+        <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2020/02/">
+                <span class="level-start">
+                    <span class="level-item">二月 2020</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">3</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2020/01/">
+                <span class="level-start">
+                    <span class="level-item">一月 2020</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">3</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/11/">
+                <span class="level-start">
+                    <span class="level-item">十一月 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                分类
+            </h3>
+            <ul class="menu-list">
+            <li>
+        <a class="level is-marginless" href="/categories/Tengine/">
+            <span class="level-start">
+                <span class="level-item">Tengine</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">2</span>
+            </span>
+        </a></li><li>
+        <a class="level is-marginless" href="/categories/glusterfs/">
+            <span class="level-start">
+                <span class="level-item">glusterfs</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">2</span>
+            </span>
+        </a></li><li>
+        <a class="level is-marginless" href="/categories/ntp/">
+            <span class="level-start">
+                <span class="level-item">ntp</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">1</span>
+            </span>
+        </a></li><li>
+        <a class="level is-marginless" href="/categories/rkhunter/">
+            <span class="level-start">
+                <span class="level-item">rkhunter</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">1</span>
+            </span>
+        </a></li><li>
+        <a class="level is-marginless" href="/categories/yum/">
+            <span class="level-start">
+                <span class="level-item">yum</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">1</span>
+            </span>
+        </a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            标签云
+        </h3>
+        <a href="/tags/centos/" style="font-size: 16.67px;">centos</a> <a href="/tags/glusterfs/" style="font-size: 13.33px;">glusterfs</a> <a href="/tags/http2/" style="font-size: 10px;">http2</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/nginx/" style="font-size: 13.33px;">nginx</a> <a href="/tags/ntp/" style="font-size: 10px;">ntp</a> <a href="/tags/openssl/" style="font-size: 10px;">openssl</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/tengine/" style="font-size: 13.33px;">tengine</a> <a href="/tags/yum%E6%BA%90/" style="font-size: 10px;">yum源</a>
+    </div>
+</div>
+
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                标签
+            </h3>
+            <div class="field is-grouped is-grouped-multiline">
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/centos/">
+                        <span class="tag">centos</span>
+                        <span class="tag is-grey">4</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/glusterfs/">
+                        <span class="tag">glusterfs</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/http2/">
+                        <span class="tag">http2</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/https/">
+                        <span class="tag">https</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/linux/">
+                        <span class="tag">linux</span>
+                        <span class="tag is-grey">7</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/nginx/">
+                        <span class="tag">nginx</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/ntp/">
+                        <span class="tag">ntp</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/openssl/">
+                        <span class="tag">openssl</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/shell/">
+                        <span class="tag">shell</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/tengine/">
+                        <span class="tag">tengine</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/yum%E6%BA%90/">
+                        <span class="tag">yum源</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+    
+    
+        <div class="column-right-shadow  is-sticky">
+        
+        </div>
+    
+</div>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+    <div class="container">
+        <div class="level">
+            <div class="level-start has-text-centered-mobile">
+                <a class="footer-logo is-block has-mb-6" href="/">
+                
+                    <img src="/images/logo.svg" alt="GlusterFS集群文件系统专题二(主要术语)" height="28">
+                
+                </a>
+                <p class="is-size-7">
+                &copy; 2020 青叶&nbsp;
+                <a href="http://www.beian.miit.gov.cn" target="_blank">粤ICP备19143656号-1</a>
+                Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank">Icarus</a>
+                        <br>
+                        <span><i class="fa fa-bug" aria-hidden="true"></i> Websit Spider <a href="http://qingye.info/baidusitemap.xml">Baidu Sitmap</a>  and  <a href="http://qingye.info/sitemap.xml">Google Sitmap</a></span>
+                
+                <br>
+                <span id="busuanzi_container_site_uv">
+                共<span id="busuanzi_value_site_uv">0</span>个访客
+                </span>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                </p>
+            </div>
+            <div class="level-end">
+            
+                <div class="field has-addons is-flex-center-mobile has-mt-5-mobile is-flex-wrap is-flex-middle">
+                
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Creative Commons" href="https://creativecommons.org/">
+                        
+                        <i class="fab fa-creative-commons"></i>
+                        
+                    </a>
+                </p>
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/">
+                        
+                        <i class="fab fa-creative-commons-by"></i>
+                        
+                    </a>
+                </p>
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Download on GitHub" href="https://github.com/qingyeinfo">
+                        
+                        <i class="fab fa-github"></i>
+                        
+                    </a>
+                </p>
+                
+                </div>
+            
+            </div>
+        </div>
+    </div>
+</footer>
+    <script src="https://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
+<script src="https://unpkg.com/moment@2.22.2/min/moment-with-locales.min.js"></script>
+<script>moment.locale("zh-CN");</script>
+
+
+    
+    
+    
+    <script src="/js/animation.js"></script>
+    
+
+    
+    
+    
+    <script src="https://unpkg.com/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script>
+    <script src="https://unpkg.com/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script>
+    <script src="/js/gallery.js" defer></script>
+    
+
+    
+    
+
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/" target="_blank" rel="noopener">Update
+            my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="https://unpkg.com/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.js" defer></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        });
+    });
+</script>
+
+
+    
+    
+    
+    
+
+<a id="back-to-top" title="回到顶端" href="javascript:;" target="_blank" rel="noopener">
+    <i class="fas fa-chevron-up"></i>
+</a>
+<script src="/js/back-to-top.js" defer></script>
+
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    <script src="https://unpkg.com/clipboard@2.0.4/dist/clipboard.min.js" defer></script>
+    <script src="/js/clipboard.js" defer></script>
+    
+
+    
+    
+    
+
+    
+    
+    
+
+    
+    
+    
+
+    
+    
+    
+
+    
+
+
+<script src="/js/main.js" defer></script>
+<script>
+    $(function(){
+        var showing = false;
+        var headEnter = false;
+        var mouseArea =  $("#knowledge-star");
+        var qrcode = $("#knowledge-qrcode");
+        var headimg = $("#blog-head-img");
+        //var originalSrc = headimg.attr("src");
+
+        function knowStarAnim(show){
+            if(show === showing) return;
+            showing = show;
+            qrcode.stop();
+            qrcode.toggle(1000);
+        }
+
+        mouseArea.mouseenter(function(){
+            knowStarAnim(true);  
+        });
+
+        mouseArea.mouseleave(function(){
+            knowStarAnim(false);
+        });
+
+        function headChangeAnim(enter){
+            if(enter === headEnter) return;
+            headEnter = enter;
+            if(enter){
+                $("img").attr("title", function() { return this.src });
+                $("img").attr("src", function(){
+                    if(this.width < 150){
+                        return "http://localhost:4000/images/avatar.png";
+                    }else{
+                        return this.src;
+                    }
+                })
+            }else{
+                $("img").attr("src", function() { return this.title });
+                $("img").removeAttr("title");
+            }
+        }
+
+        headimg.mouseenter(function(){
+            headChangeAnim(true);
+        });
+        headimg.mouseleave(function(){
+            headChangeAnim(false);
+        });
+    });
+</script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="想要查找什么..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: '文章',
+                PAGES: '页面',
+                CATEGORIES: '分类',
+                TAGS: '标签',
+                UNTITLED: '(无标题)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js" defer></script>
+<link rel="stylesheet" href="/css/search.css">
+<link rel="stylesheet" href="/css/insight.css">
+    
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/miku.model.json"},"display":{"position":"right","width":300,"height":600},"mobile":{"show":true},"react":{"opacity":0.7},"log":false});</script></body>
+</html>
