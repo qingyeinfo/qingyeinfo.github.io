@@ -1,1254 +1,181 @@
-<!DOCTYPE html>
-<html  lang="zh">
-<head>
-    <meta charset="utf-8">
-<title>qingye&#39;s blog</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="generator" content="Hexo 4.2.0"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>青叶の博客</title><meta description="linux,技术分享,运维"><meta property="og:type" content="website"><meta property="og:title" content="青叶の博客"><meta property="og:url" content="http://qingye.info/"><meta property="og:site_name" content="青叶の博客"><meta property="og:description" content="linux,技术分享,运维"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://cloud.qingye.info/images/avatar.jpg"><meta property="article:author" content="青叶"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="https://cloud.qingye.info/images/avatar.jpg"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://qingye.info/"},"headline":"青叶の博客","image":["https://cloud.qingye.info/images/avatar.jpg"],"author":{"@type":"Person","name":"青叶"},"description":"linux,技术分享,运维"}</script><link rel="alternative" href="/atom.xml" title="青叶の博客" type="application/atom+xml"><link rel="icon" href="/img/favicon.ico"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,600|Source+Code+Pro|Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&amp;amp;subset=latin,latin-ext|Inconsolata|Itim|Lobster.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-dark.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" defer></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css"><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script><link rel="stylesheet" href="https://www.qingye.info/css/style.css"><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://www.qingye.info/js/globalUtils.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.js"></script></head><body class="is-2-column has-navbar-fixed-top"><nav class="navbar navbar-main is-fixed-top"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="青叶の博客" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item is-active" href="/">首页</a><a class="navbar-item" href="/archives">归档</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/media">音乐</a><a class="navbar-item" href="/video">视频</a><a class="navbar-item" href="/share">海报</a><a class="navbar-item" href="/album">美女</a><a class="navbar-item" href="/friend">友链</a><a class="navbar-item" href="/message">留言</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/qingyeinfo"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a><a class="navbar-item" id="night-nav" title="Night Mode" href="javascript:;"><i class="fas fa-moon" id="night-icon"></i></a></div></div></div></nav><script type="text/javascript" src="https://www.qingye.info/js/theme-setting.js"></script><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta size-small is-uppercase level is-mobile"><div class="level-left"><time class="level-item" dateTime="2020-03-30T15:40:07.000Z">2020-03-30</time><span class="level-item"><i class="fas fa-folder-open has-text-grey"> </i><a class="link-muted" href="/categories/k8s/">k8s</a></span><span class="level-item">4 分钟 读完 (大约 650 个字)</span></div></div><h1 class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2020/03/30/k8s/K8S-LXCFS/">利用LXCFS提升容器资源可见性</a></h1><div class="content"><h2 id="你好呀，本博客已经迁移至-青叶の博客-持续更新，如需访问，请点击-青叶の博客"><a href="#你好呀，本博客已经迁移至-青叶の博客-持续更新，如需访问，请点击-青叶の博客" class="headerlink" title="!!!你好呀，本博客已经迁移至[青叶の博客]持续更新，如需访问，请点击:青叶の博客"></a><font color='red'>!!!你好呀，本博客已经迁移至[青叶の博客]持续更新，如需访问，请点击:<a href="http://qingye.info">青叶の博客</a></font></h2><p>由于默认情况下容器挂载的是宿主机的硬件配置信息，导致有些应用根据这些信息来决定启动内存等的大小，导致应用内存溢出等问题。</p>
+<p>LXCFS简介</p>
+<p>社区中常见的做法是利用 lxcfs来提供容器中的资源可见性。lxcfs 是一个开源的FUSE（用户态文件系统）实现来支持LXC容器，它也可以支持Docker容器。</p>
+<p>LXCFS通过用户态文件系统，在容器中提供下列 procfs 的文件。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">/proc/cpuinfo</span></span><br><span class="line"><span class="string">/proc/diskstats</span></span><br><span class="line"><span class="string">/proc/meminfo</span></span><br><span class="line"><span class="string">/proc/stat</span></span><br><span class="line"><span class="string">/proc/swaps</span></span><br><span class="line"><span class="string">/proc/uptime</span></span><br></pre></td></tr></table></figure>
 
-
-
-    <meta property="og:type" content="website">
-<meta property="og:title" content="qingye&#39;s blog">
-<meta property="og:url" content="http:&#x2F;&#x2F;qingye.info&#x2F;index.html">
-<meta property="og:site_name" content="qingye&#39;s blog">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http:&#x2F;&#x2F;qingye.info&#x2F;images&#x2F;og_image.png">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http:&#x2F;&#x2F;qingye.info&#x2F;images&#x2F;og_image.png">
-
-
-
-
-
-<link rel="alternative" href="/atom.xml" title="qingye&#39;s blog" type="application/atom+xml">
-
-
-
-<link rel="icon" href="/images/favicon.ico">
-
-
-<link rel="stylesheet" href="https://unpkg.com/bulma@0.7.2/css/bulma.css">
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,600|Source+Code+Pro">
-<link rel="stylesheet" href="https://unpkg.com/highlight.js@9.12.0/styles/atom-one-dark.css">
-
-
-    
-    
-    
-    <style>body>.footer,body>.navbar,body>.section{opacity:0}</style>
-    
-
-    
-    
-    
-    <link rel="stylesheet" href="https://unpkg.com/lightgallery@1.6.8/dist/css/lightgallery.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css">
-    
-
-    
-    
-
-<link rel="stylesheet" href="https://unpkg.com/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.css">
-
-
-    
-    
-    
-    
-
-<link rel="stylesheet" href="/css/back-to-top.css">
-
-
-    
-    
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-118599694-1"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'UA-118599694-1');
-</script>
-
-
-    
-    
-<script>
-var _hmt = _hmt || [];
-(function() {
-    var hm = document.createElement("script");
-    hm.src = "//hm.baidu.com/hm.js?f58a5db01159bcd69ce92836dd9bbbb2";
-    var s = document.getElementsByTagName("script")[0];
-    s.parentNode.insertBefore(hm, s);
-})();
-</script>
-
-    
-    
-
-    
-    
-<link rel="stylesheet" href="/css/progressbar.css">
-<script src="https://unpkg.com/pace-js@1.0.2/pace.min.js"></script>
-
-    
-    
-    
-
-    
-    
-    
-        <script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    
-
-    
-    
-    
-        <script type="text/javascript" src="https://js.users.51.la/20079919.js"></script>
-    
-
-    
-    
-    
-        <script>
-            (function(){
-                var bp = document.createElement('script');
-                var curProtocol = window.location.protocol.split(':')[0];
-                if (curProtocol === 'https'){
-               bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
-              }
-              else{
-              bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-              }
-                var s = document.getElementsByTagName("script")[0];
-                s.parentNode.insertBefore(bp, s);
-            })();
-            </script>
-    
-
-    
-    
-    
-        <script>
-            (function(){
-            var src = (document.location.protocol == "http:") ? "http://js.passport.qihucdn.com/11.0.1.js?428f95ddc1f1e1d2fe658679fcd2092b":"https://jspassport.ssl.qhimg.com/11.0.1.js?428f95ddc1f1e1d2fe658679fcd2092b";
-            document.write('<script src="' + src + '" id="sozz"><\/script>');
-            })();
-        </script>
-    
-
-    
-
-
-<link rel="stylesheet" href="/css/style.css">
-</head>
-<body class="is-2-column">
-    <nav class="navbar navbar-main">
-    <div class="container">
-        <div class="navbar-brand is-flex-center">
-            <a class="navbar-item navbar-logo" href="/">
-            
-                <img src="/images/logo.svg" alt="qingye&#39;s blog" height="28">
-            
-            </a>
-        </div>
-        <div class="navbar-menu">
-            
-            <div class="navbar-start">
-                
-                <a class="navbar-item is-active"
-                href="/">首页</a>
-                
-                <a class="navbar-item"
-                href="/archives/">归档</a>
-                
-                <a class="navbar-item"
-                href="/categories">分类</a>
-                
-                <a class="navbar-item"
-                href="/tags">标签</a>
-                
-                <a class="navbar-item"
-                href="/about">关于</a>
-                
-            </div>
-            
-            <div class="navbar-end">
-                
-                    
-                    
-                    <a class="navbar-item" target="_blank" title="Download on GitHub" href="https://github.com/qingyeinfo">
-                        
-                        <i class="fab fa-github"></i>
-                        
-                    </a>
-                    
-                
-                
-                
-                <a class="navbar-item search" title="搜索" href="javascript:;" target="_blank" rel="noopener">
-                    <i class="fas fa-search"></i>
-                </a>
-                
-            </div>
-        </div>
-    </div>
-</nav>
-    
-    <section class="section">
-        <div class="container">
-            <div class="columns">
-                <div class="column is-8-tablet is-9-desktop is-9-widescreen has-order-2 column-main"><link rel="stylesheet" href="/css/main_banner.css">
-<div id='banner' class='card'></div>
-<div class="tags hot-tags"></div>
-<script src="/js/main_banner.js" defer></script>
-<script src="/js/hot-tags.js" defer></script>
-
-    <div class="card">
-    
-    <div class="card-content article ">
-        
-        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
-            <div class="level-left">
-                <time class="level-item has-text-grey" datetime="2020-02-28T14:51:30.000Z">2020-02-28</time>
-                
-                <div class="level-item">
-                <a class="has-link-grey -link" href="/categories/glusterfs/">glusterfs</a>
-                </div>
-                
-                
-                <span class="level-item has-text-grey">
-                    
-                    
-                    8 分钟 读完 (大约 1249 个字)
-                </span>
-                
-                
-            </div>
-        </div>
-        
-        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
-            
-                <a class="has-link-black-ter" href="/2020/02/28/glusterfs-two/">GlusterFS集群文件系统专题二(主要术语)</a>
-            
-        </h1>
-        <div class="content">
-            <h3 id="1-Trusted-Storage-Pool"><a href="#1-Trusted-Storage-Pool" class="headerlink" title="1.Trusted Storage  Pool"></a><em>1.Trusted Storage  Pool</em></h3><ul>
-<li>一堆存储节点的集合</li>
-<li>通过一个节点“邀请”其他节点创建，这里叫probe</li>
-<li>成员可以动态加入，动态删除<br>添加命令如下：<br>node1# gluster peer probe node2<br>删除命令如下：<br>node1# gluster peer detach node3</li>
-</ul>
-<p><img src="https://cloud.qingye.info/images/20200226/glusterfs2_1.png" alt="图1 GlusterFS存储池"></p>
-<h3 id="2-Bricks"><a href="#2-Bricks" class="headerlink" title="2.Bricks"></a><em>2.Bricks</em></h3><ul>
-<li>Brick是一个节点和一个导出目录的集合，e.g. node1:/brick1</li>
-<li>Brick是底层的RAID或磁盘经XFS或ext4文件系统格式化而来，所以继承了文件系统的限制</li>
-<li>每个节点上的brick数是不限的</li>
-<li>理想的状况是，一个集群的所有Brick大小都一样</li></ul>
-        </div>
-        
-        
-        <div class="level is-mobile">
-            <div class="level-start">
-                <div class="level-item">
-                <a class="button is-size-7 is-light" href="/2020/02/28/glusterfs-two/#more">阅读更多</a>
-                </div>
-            </div>
-        </div>
-        
-        
-    </div>
-</div>
-
-
-
-
-
-
-
-
-    <div class="card">
-    
-    <div class="card-content article ">
-        
-        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
-            <div class="level-left">
-                <time class="level-item has-text-grey" datetime="2020-02-25T15:20:56.000Z">2020-02-25</time>
-                
-                <div class="level-item">
-                <a class="has-link-grey -link" href="/categories/glusterfs/">glusterfs</a>
-                </div>
-                
-                
-                <span class="level-item has-text-grey">
-                    
-                    
-                    1 小时 读完 (大约 9001 个字)
-                </span>
-                
-                
-            </div>
-        </div>
-        
-        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
-            
-                <a class="has-link-black-ter" href="/2020/02/25/glusterfs-one/">GlusterFS集群文件系统专题一(基础原理)</a>
-            
-        </h1>
-        <div class="content">
-            <p>(版权声明：本文为CSDN博主「刘爱贵」的原创文章。<a href="https://blog.csdn.net/liuaigui/article/details/6284551" target="_blank" rel="noopener">原文链接</a>)</p>
-<h3 id="1-概述"><a href="#1-概述" class="headerlink" title="1.概述"></a>1.概述</h3><p>GlusterFS是Scale-Out存储解决方案Gluster的核心，它是一个开源的分布式文件系统，具有强大的横向扩展能力，通过扩展能够支持数PB存储容量和处理数千客户端。GlusterFS借助TCP/IP或InfiniBand RDMA网络将物理分布的存储资源聚集在一起，使用单一全局命名空间来管理数据。GlusterFS基于可堆叠的用户空间设计，可为各种不同的数据负载提供优异的性能。</p>
-<p><img src="https://cloud.qingye.info/images/20200225/glusterfs1_1.png" alt="图1 GlusterFS统一的挂载点"></p>
-<p>GlusterFS支持运行在任何标准IP网络上标准应用程序的标准客户端，如图2所示，用户可以在全局统一的命名空间中使用NFS/CIFS等标准协议来访问应用数据。GlusterFS使得用户可摆脱原有的独立、高成本的封闭存储系统，能够利用普通廉价的存储设备来部署可集中管理、横向扩展、虚拟化的存储池，存储容量可扩展至TB/PB级。GlusterFS主要特征如下：</p>
+<p>LXCFS的示意图如下：</p>
+<p><img src="https://cloud.qingye.info/images/20200330/image2018-11-12_9-20-40.png" alt="LXCFS的示意图"></p>
+<p>比如，把宿主机的 /var/lib/lxcfs/proc/memoinfo 文件挂载到Docker容器的/proc/meminfo位置后。容器中进程读取相应文件内容时，LXCFS的FUSE实现会从容器对应的Cgroup中读取正确的内存限制。从而使得应用获得正确的资源约束设定。</p>
+<p>安装lxcfs ，先安装需要使用的依赖包：</p>
+<p>yum install <a href="http://mirror.centos.org/centos/7/os/x86_64/Packages/fuse-libs-2.9.2-10.el7.x86_64.rpm">http://mirror.centos.org/centos/7/os/x86_64/Packages/fuse-libs-2.9.2-10.el7.x86_64.rpm</a></p>
+<p>用deamonset方式在每个节点启动一个lxcfs,lxcfs-daemonset.yaml配置如下:</p></div><div class="level is-mobile is-flex"><div class="level-start"><div class="is-uppercase article-more button is-small size-small"><i class="fas fa-tags has-text-grey"></i> <a class="link-muted mr-2" rel="tag" href="/tags/linux/">linux</a><a class="link-muted mr-2" rel="tag" href="/tags/centos/">centos</a><a class="link-muted mr-2" rel="tag" href="/tags/k8s/">k8s</a><a class="link-muted mr-2" rel="tag" href="/tags/%E5%AE%B9%E5%99%A8/">容器</a><a class="link-muted mr-2" rel="tag" href="/tags/docker/">docker</a></div></div><div class="level-start"><div class="level-item has-text-grey is-size-7 is-hidden-mobile"><time datetime="2020-04-17T17:23:22.831Z"><i class="far fa-calendar-check"> 最后修改: </i>2020-04-18</time></div></div><div class="level-start"><div class="level-item"><a class="article-more button is-small size-small link-muted" href="/2020/03/30/k8s/K8S-LXCFS/#more"><i class="fas fa-book-reader has-text-grey"> </i>阅读更多&gt;&gt;</a></div></div></div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta size-small is-uppercase level is-mobile"><div class="level-left"><time class="level-item" dateTime="2020-03-30T15:20:07.000Z">2020-03-30</time><span class="level-item"><i class="fas fa-folder-open has-text-grey"> </i><a class="link-muted" href="/categories/k8s/">k8s</a></span><span class="level-item">6 分钟 读完 (大约 949 个字)</span></div></div><h1 class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2020/03/30/k8s/nginx-ingress-controller/">nginx-ingress-controller部署</a></h1><div class="content"><h3 id="1-打标签"><a href="#1-打标签" class="headerlink" title="1.打标签"></a><em>1.打标签</em></h3><p>由于nginx要部署到指定节点上，所以需要对node打个label，通过nodeSelector调度到节点上，同时要确保部署节点主机的80、443、18080、10254端口没有被占用。<br>kubectl label node ss-1-centos221 nginx-ingress=nginx<br>kubectl label node ss-1-centos221-2 nginx-ingress=nginx</p>
+<h3 id="2-准备nginx-ingress-controller部署文件"><a href="#2-准备nginx-ingress-controller部署文件" class="headerlink" title="2.准备nginx-ingress-controller部署文件"></a><em>2.准备nginx-ingress-controller部署文件</em></h3><h4 id="2-1-nginx-ingress-controller-rbac-yaml-：设置rabc权限"><a href="#2-1-nginx-ingress-controller-rbac-yaml-：设置rabc权限" class="headerlink" title="2.1 nginx-ingress-controller-rbac.yaml ：设置rabc权限"></a>2.1 nginx-ingress-controller-rbac.yaml ：设置rabc权限</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ServiceAccount</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-ingress-serviceaccount</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">kube-system</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">rbac.authorization.k8s.io/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ClusterRole</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-ingress-clusterrole</span></span><br><span class="line"><span class="attr">rules:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">apiGroups:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">""</span></span><br><span class="line">    <span class="attr">resources:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">configmaps</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">endpoints</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">nodes</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">pods</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">secrets</span></span><br><span class="line">    <span class="attr">verbs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">list</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">watch</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">apiGroups:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">""</span></span><br><span class="line">    <span class="attr">resources:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">nodes</span></span><br><span class="line">    <span class="attr">verbs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">get</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">apiGroups:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">""</span></span><br><span class="line">    <span class="attr">resources:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">services</span></span><br><span class="line">    <span class="attr">verbs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">get</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">list</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">watch</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">apiGroups:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">"extensions"</span></span><br><span class="line">    <span class="attr">resources:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ingresses</span></span><br><span class="line">    <span class="attr">verbs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">get</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">list</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">watch</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">apiGroups:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">""</span></span><br><span class="line">    <span class="attr">resources:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">events</span></span><br><span class="line">    <span class="attr">verbs:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">create</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">patch</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">apiGroups:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">"extensions"</span></span><br><span class="line">    <span class="attr">resources:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ingresses/status</span></span><br><span class="line">    <span class="attr">verbs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">update</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">rbac.authorization.k8s.io/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Role</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-ingress-role</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">kube-system</span></span><br><span class="line"><span class="attr">rules:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">apiGroups:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">""</span></span><br><span class="line">    <span class="attr">resources:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">configmaps</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">pods</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">secrets</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">namespaces</span></span><br><span class="line">    <span class="attr">verbs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">get</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">apiGroups:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">""</span></span><br><span class="line">    <span class="attr">resources:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">configmaps</span></span><br><span class="line">    <span class="attr">resourceNames:</span></span><br><span class="line">      <span class="comment"># Defaults to "&lt;election-id&gt;-&lt;ingress-class&gt;"</span></span><br><span class="line">      <span class="comment"># Here: "&lt;ingress-controller-leader&gt;-&lt;nginx&gt;"</span></span><br><span class="line">      <span class="comment"># This has to be adapted if you change either parameter</span></span><br><span class="line">      <span class="comment"># when launching the nginx-ingress-controller.</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">"ingress-controller-leader-nginx"</span></span><br><span class="line">    <span class="attr">verbs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">get</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">update</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">apiGroups:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">""</span></span><br><span class="line">    <span class="attr">resources:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">configmaps</span></span><br><span class="line">    <span class="attr">verbs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">create</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">apiGroups:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">""</span></span><br><span class="line">    <span class="attr">resources:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">endpoints</span></span><br><span class="line">    <span class="attr">verbs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">get</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">rbac.authorization.k8s.io/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">RoleBinding</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-ingress-role-nisa-binding</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">kube-system</span></span><br><span class="line"><span class="attr">roleRef:</span></span><br><span class="line">  <span class="attr">apiGroup:</span> <span class="string">rbac.authorization.k8s.io</span></span><br><span class="line">  <span class="attr">kind:</span> <span class="string">Role</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-ingress-role</span></span><br><span class="line"><span class="attr">subjects:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">kind:</span> <span class="string">ServiceAccount</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">nginx-ingress-serviceaccount</span></span><br><span class="line">    <span class="attr">namespace:</span> <span class="string">kube-system</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">rbac.authorization.k8s.io/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ClusterRoleBinding</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-ingress-clusterrole-nisa-binding</span></span><br><span class="line"><span class="attr">roleRef:</span></span><br><span class="line">  <span class="attr">apiGroup:</span> <span class="string">rbac.authorization.k8s.io</span></span><br><span class="line">  <span class="attr">kind:</span> <span class="string">ClusterRole</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-ingress-clusterrole</span></span><br><span class="line"><span class="attr">subjects:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">kind:</span> <span class="string">ServiceAccount</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">nginx-ingress-serviceaccount</span></span><br><span class="line">    <span class="attr">namespace:</span> <span class="string">kube-system</span></span><br></pre></td></tr></table></figure></div><div class="level is-mobile is-flex"><div class="level-start"><div class="is-uppercase article-more button is-small size-small"><i class="fas fa-tags has-text-grey"></i> <a class="link-muted mr-2" rel="tag" href="/tags/linux/">linux</a><a class="link-muted mr-2" rel="tag" href="/tags/centos/">centos</a><a class="link-muted mr-2" rel="tag" href="/tags/k8s/">k8s</a><a class="link-muted mr-2" rel="tag" href="/tags/%E5%AE%B9%E5%99%A8/">容器</a><a class="link-muted mr-2" rel="tag" href="/tags/docker/">docker</a></div></div><div class="level-start"><div class="level-item has-text-grey is-size-7 is-hidden-mobile"><time datetime="2020-04-16T13:13:18.858Z"><i class="far fa-calendar-check"> 最后修改: </i>2020-04-16</time></div></div><div class="level-start"><div class="level-item"><a class="article-more button is-small size-small link-muted" href="/2020/03/30/k8s/nginx-ingress-controller/#more"><i class="fas fa-book-reader has-text-grey"> </i>阅读更多&gt;&gt;</a></div></div></div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta size-small is-uppercase level is-mobile"><div class="level-left"><time class="level-item" dateTime="2020-03-29T12:09:07.000Z">2020-03-29</time><span class="level-item"><i class="fas fa-folder-open has-text-grey"> </i><a class="link-muted" href="/categories/http/">http</a></span><span class="level-item">20 分钟 读完 (大约 2950 个字)</span></div></div><h1 class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2020/03/29/linux/Cross-domain-requests/">跨域请求以及实现跨域的方案</a></h1><div class="content"><h3 id="1-什么是跨域请求"><a href="#1-什么是跨域请求" class="headerlink" title="1.什么是跨域请求"></a><em>1.什么是跨域请求</em></h3><p>A cross-domain solution (CDS) is a means of information assurance that provides the ability to manually or automatically access or transfer between two or more differing security domains.</p>
+<p>解决两个安全域之间的信息传递，这个就叫做CDS——跨域解决方案.</p>
+<p>在 HTML 中，&lt;a&gt;, &lt;form&gt;, &lt;img&gt;, &lt;script&gt;, &lt;iframe&gt;, &lt;link&gt;等标签以及 Ajax(异步 JavaScript 和 XML) 都可以指向一个资源地址，而所谓的跨域请求就是指：当前发起请求的域与该请求指向的资源所在的域不一样。<br>这里的域指的是这样的一个概念：我们认为若协议 + 域名 + 端口号均相同，那么就是同域.</p>
+<h3 id="2-跨域请求的安全问题"><a href="#2-跨域请求的安全问题" class="headerlink" title="2.跨域请求的安全问题"></a><em>2.跨域请求的安全问题</em></h3><p>通常，浏览器会对上面提到的跨域请求作出限制。浏览器之所以要对跨域请求作出限制，是出于安全方面的考虑，因为跨域请求有可能被不法分子利用来发动 CSRF攻击。</p>
+<p>CSRF攻击：<br>CSRF（Cross-site request forgery），中文名称：跨站请求伪造，也被称为：one click attack/session riding，缩写为：CSRF/XSRF。CSRF攻击者在用户已经登录目标网站之后，诱使用户访问一个攻击页面，利用目标网站对用户的信任，以用户身份在攻击页面对目标网站发起伪造用户操作的请求，达到攻击目的。</p>
+<p>CSRF 攻击的原理大致描述如下：有两个网站，其中A网站是真实受信任的网站，而B网站是危险网站。在用户登陆了受信任的A网站是，本地会存储A网站相关的Cookie，并且浏览器也维护这一个Session会话。这时，如果用户在没有登出A网站的情况下访问危险网站B，那么危险网站B就可以模拟发出一个对A网站的请求（跨域请求）对A网站进行操作，而在A网站的角度来看是并不知道请求是由B网站发出来的（Session和Cookie均为A网站的），这时便成功发动一次CSRF 攻击。</p>
+<p>因而 CSRF 攻击可以简单理解为：攻击者盗用了你的身份，以你的名义发送而已请求。CSRF能够做的事情包括：以你名义发送邮件，发消息，盗取你的账号，甚至于购买商品，虚拟货币转账……造成的问题包括：个人隐私泄露以及财产安全。</p>
+<h3 id="3-同源策略"><a href="#3-同源策略" class="headerlink" title="3.同源策略"></a><em>3.同源策略</em></h3><p>在客户端编程语言中，如javascript和ActionScript，同源策略是一个很重要的安全理念，它在保证数据的安全性方面有着重要的意义。同源策略规定跨域之间的脚本是隔离的，一个域的脚本不能访问和操作另外一个域的绝大部分属性和方法</p>
+<p>概述：<br>同源策略是 Netscape 提出的一个著名的安全策略<br>同源策略是浏览器最核心最基础的安全策略<br>现在所有的可支持 Javascript 的浏览器都会使用这个策略<br>web构建在同源策略基础之上，浏览器对非同源脚本的限制措施是对同源策略的具体实现</p>
+<p>同源策略的含义：<br>DOM 层面的同源策略：限制了来自不同源的”Document”对象或 JS 脚本，对当前“document”对象的读取或设置某些属性<br>Cookie和XMLHttprequest层面的同源策略：禁止 Ajax 直接发起跨域HTTP请求（其实可以发送请求，结果被浏览器拦截，不展示），同时 Ajax 请求不能携带与本网站不同源的 Cookie。<br>同源策略的非绝对性：&lt;script&gt;&lt;img&gt;&lt;iframe&gt;&lt;link&gt;&lt;video&gt;&lt;audio&gt;等带有src属性的标签可以从不同的域加载和执行资源。<br>其他插件的同源策略：flash、java applet、silverlight、googlegears等浏览器加载的第三方插件也有各自的同源策略，只是这些同源策略不属于浏览器原生的同源策略，如果有漏洞则可能被黑客利用，从而留下XSS攻击的后患</p></div><div class="level is-mobile is-flex"><div class="level-start"><div class="is-uppercase article-more button is-small size-small"><i class="fas fa-tags has-text-grey"></i> <a class="link-muted mr-2" rel="tag" href="/tags/linux/">linux</a><a class="link-muted mr-2" rel="tag" href="/tags/http/">http</a><a class="link-muted mr-2" rel="tag" href="/tags/centos/">centos</a><a class="link-muted mr-2" rel="tag" href="/tags/cross-domain/">cross-domain</a><a class="link-muted mr-2" rel="tag" href="/tags/%E8%B7%A8%E5%9F%9F/">跨域</a></div></div><div class="level-start"><div class="level-item has-text-grey is-size-7 is-hidden-mobile"><time datetime="2020-04-16T13:14:08.552Z"><i class="far fa-calendar-check"> 最后修改: </i>2020-04-16</time></div></div><div class="level-start"><div class="level-item"><a class="article-more button is-small size-small link-muted" href="/2020/03/29/linux/Cross-domain-requests/#more"><i class="fas fa-book-reader has-text-grey"> </i>阅读更多&gt;&gt;</a></div></div></div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta size-small is-uppercase level is-mobile"><div class="level-left"><time class="level-item" dateTime="2020-03-29T11:40:07.000Z">2020-03-29</time><span class="level-item"><i class="fas fa-folder-open has-text-grey"> </i><a class="link-muted" href="/categories/http/">http</a></span><span class="level-item">12 分钟 读完 (大约 1818 个字)</span></div></div><h1 class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2020/03/29/linux/restful-api/">RESTful API 了解</a></h1><div class="content"><h3 id="1-REST概念"><a href="#1-REST概念" class="headerlink" title="1.REST概念"></a><em>1.REST概念</em></h3><p>REST全称是Representational State Transfer。要理解RESTful架构，需要理解Representational State Transfer这个词组到底是什么意思，它的每一个词都有些什么涵义。下面我们结合REST原则，围绕资源展开讨论，从资源的定义、获取、表述、关联、状态变迁等角度，列举一些关键概念并加以解释。</p>
 <ul>
-<li><strong>扩展性和高性能</strong></li>
+<li>资源与URI</li>
+<li>统一资源接口</li>
+<li>资源的表述</li>
+<li>资源的链接</li>
+<li>状态的转移</li>
 </ul>
-<p>GlusterFS利用双重特性来提供几TB至数PB的高扩展存储解决方案。Scale-Out架构允许通过简单地增加资源来提高存储容量和性能，磁盘、计算和I/O资源都可以独立增加，支持10GbE和InfiniBand等高速网络互联。Gluster弹性哈希（Elastic Hash）解除了GlusterFS对元数据服务器的需求，消除了单点故障和性能瓶颈，真正实现了并行化数据访问。</p>
+<h3 id="2-RESTful-API概念"><a href="#2-RESTful-API概念" class="headerlink" title="2.RESTful API概念"></a><em>2.RESTful API概念</em></h3><p>在开发的过程中，我们经常会听到前后端分离这个技术名词，顾名思义，就是前台的开发和后台的开发分离开。这个技术方案的实现就是要借助API，API简单说就是开发人员提供编程接口被其他人调用，他们调用之后会返回数据供其使用。API的类型有多种，但是现在比较主流且实用的就是RESTful API。</p>
+<p>RESTful API 的总结：<br>1.每一个URL代表一种资源<br>2.客户端和服务器之间，传递这种资源的某种表现层<br>3.客户端通过四个HTTP动词，对服务器端资源进行操作，实现”表现层状态转化”。具体为：<br>GET用来获取资源，POST用来新建资源（也可以用于更新资源），PUT用来更新资源，DELETE用来删除资源。</p>
+<h4 id="2-1-RESTful-API方法-GET"><a href="#2-1-RESTful-API方法-GET" class="headerlink" title="2.1 RESTful API方法-GET"></a><em>2.1 RESTful API方法-GET</em></h4><ul>
+<li><p>安全且幂等</p>
+</li>
+<li><p>获取表示</p>
+</li>
+<li><p>变更时获取表示（缓存）</p>
+</li>
+<li><p>200（OK） - 表示已在响应中发出</p>
+</li>
+<li><p>204（无内容） - 资源有空表示</p>
+</li>
+<li><p>301（Moved Permanently） - 资源的URI已被更新</p>
+</li>
+<li><p>303（See Other） - 其他（如，负载均衡）</p>
+</li>
+<li><p>304（not modified）- 资源未更改（缓存）</p>
+</li>
+<li><p>400 （bad request）- 指代坏请求（如，参数错误）</p>
+</li>
+<li><p>404 （not found）- 资源不存在</p>
+</li>
+<li><p>406 （not acceptable）- 服务端不支持所需表示</p>
+</li>
+<li><p>500 （internal server error）- 通用错误响应</p>
+</li>
+<li><p>503 （Service Unavailable）- 服务端当前无法处理请求</p></div><div class="level is-mobile is-flex"><div class="level-start"><div class="is-uppercase article-more button is-small size-small"><i class="fas fa-tags has-text-grey"></i> <a class="link-muted mr-2" rel="tag" href="/tags/linux/">linux</a><a class="link-muted mr-2" rel="tag" href="/tags/http/">http</a><a class="link-muted mr-2" rel="tag" href="/tags/centos/">centos</a><a class="link-muted mr-2" rel="tag" href="/tags/RESTful-API/">RESTful API</a></div></div><div class="level-start"><div class="level-item has-text-grey is-size-7 is-hidden-mobile"><time datetime="2020-03-29T11:52:27.138Z"><i class="far fa-calendar-check"> 最后修改: </i>2020-03-29</time></div></div><div class="level-start"><div class="level-item"><a class="article-more button is-small size-small link-muted" href="/2020/03/29/linux/restful-api/#more"><i class="fas fa-book-reader has-text-grey"> </i>阅读更多&gt;&gt;</a></div></div></div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta size-small is-uppercase level is-mobile"><div class="level-left"><time class="level-item" dateTime="2020-03-29T11:12:07.000Z">2020-03-29</time><span class="level-item"><i class="fas fa-folder-open has-text-grey"> </i><a class="link-muted" href="/categories/k8s/">k8s</a></span><span class="level-item">6 分钟 读完 (大约 833 个字)</span></div></div><h1 class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2020/03/29/k8s/k8s-dubbo/">k8s+dubbo架构集群内外网络通讯解决方案</a></h1><div class="content"><h3 id="1-问题"><a href="#1-问题" class="headerlink" title="1.问题"></a><em>1.问题</em></h3><p>k8s有自己的一套网络管理机制，集群内的容器和容器之间是可以相互通信的。</p>
+<p>但是在容器化升级改造的过程中，不可能一步到位的将所有的服务全部迁移到k8s的容器当中来，毕竟新的技术在没有经过实践趟坑时，肯定不能轻易的全面铺开升级。</p>
+<p>那么就涉及到集群外的服务访问集群内的服务，集群内容器中的ip都是k8s管理的IP，dubbo服务注册的也是获取的容器内分配的IP。</p>
+<p>比如宿主机ip是10.201.7.xx,容器内的ip就是172.66.4.x。群外的和宿主主机同网段的服务通过拿到dubbo的注册的172.66.4.x也根本没法访问容器内的dubbo服务。</p>
+<h3 id="2-分析"><a href="#2-分析" class="headerlink" title="2.分析"></a><em>2.分析</em></h3><p>k8s是通过Service来暴露集群内的服务，假如dubbo服务注册的是Service暴露的端口和宿主的IP那么集群外的服务就可以直接访问集群内容器中的服务了。</p>
+<p>该方案主要有两个难点：</p>
+<p>1.如何获取Service暴露的端口和宿主机的IP注入到POD环境变量；</p>
+<p>2.Dubbo服务如何从环境变量获取IP和端口注册到ZK；</p>
+<p>关于难点1：</p>
+<p>通过downward-api的方式向Pod内注入NodeIP的env；</p>
+<p>通过给Pod注入env的方式将NodePort注入到Pod内；（要求先创建Service）</p>
+<p>关于难点2：</p>
+<p>Dubbo在启动阶段提供两对系统属性，用于设置外部通信的IP和端口地址。</p>
+<p>DUBBO_IP_TO_REGISTRY — 注册到注册中心的IP地址<br>DUBBO_PORT_TO_REGISTRY — 注册到注册中心的端口<br>DUBBO_IP_TO_BIND — 监听IP地址<br>DUBBO_PORT_TO_BIND — 监听端口</p></div><div class="level is-mobile is-flex"><div class="level-start"><div class="is-uppercase article-more button is-small size-small"><i class="fas fa-tags has-text-grey"></i> <a class="link-muted mr-2" rel="tag" href="/tags/linux/">linux</a><a class="link-muted mr-2" rel="tag" href="/tags/centos/">centos</a><a class="link-muted mr-2" rel="tag" href="/tags/k8s/">k8s</a><a class="link-muted mr-2" rel="tag" href="/tags/%E5%AE%B9%E5%99%A8/">容器</a><a class="link-muted mr-2" rel="tag" href="/tags/docker/">docker</a></div></div><div class="level-start"><div class="level-item has-text-grey is-size-7 is-hidden-mobile"><time datetime="2020-04-16T13:07:11.210Z"><i class="far fa-calendar-check"> 最后修改: </i>2020-04-16</time></div></div><div class="level-start"><div class="level-item"><a class="article-more button is-small size-small link-muted" href="/2020/03/29/k8s/k8s-dubbo/#more"><i class="fas fa-book-reader has-text-grey"> </i>阅读更多&gt;&gt;</a></div></div></div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta size-small is-uppercase level is-mobile"><div class="level-left"><time class="level-item" dateTime="2020-03-28T02:07:07.000Z">2020-03-28</time><span class="level-item"><i class="fas fa-folder-open has-text-grey"> </i><a class="link-muted" href="/categories/k8s/">k8s</a></span><span class="level-item">14 分钟 读完 (大约 2032 个字)</span></div></div><h1 class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2020/03/28/k8s/Docker-Image/">深刻理解Docker镜像大小</a></h1><div class="content"><h3 id="1-docker镜像分析"><a href="#1-docker镜像分析" class="headerlink" title="1.docker镜像分析"></a><em>1.docker镜像分析</em></h3><p>是否还记得第一个接触Docker的时候，你从Docker Hub下拉的那个镜像呢？在那个处女镜像的基础上，你运行了容器生涯的处女容器。镜像的基石作用已经很明显，在Docker的世界里，可以说是：No Image，No Container。</p>
+<p>再进一步思考Docker镜像，大家可能很快就会联想到以下几类镜像：</p>
+<p>1.系统级镜像:如Ubuntu镜像，CentOS镜像以及Debian容器等；</p>
+<p>2.工具栈镜像:如Golang镜像，Flask镜像，Tomcat镜像等；</p>
+<p>3.服务级镜像:如MySQL镜像，MongoDB镜像，RabbitMQ镜像等；</p>
+<p>4.应用级镜像:如WordPress镜像，DockerRegistry镜像等。</p>
+<p>镜像林林总总，想要运行Docker容器，必须要有Docker镜像；想要有Docker镜像，必须要先下载Docker镜像；既然涉及到下载Docker镜像，自然会存在Docker镜像存储。谈到Docker镜像存储，那我们首先来聊聊Docker镜像大小方面的知识。</p>
+<p>以下将从三个角度来分析Docker镜像的大小问题：Dockerfile与镜像、联合文件系统以及镜像共享关系。</p>
+<p>Dockerfile与镜像<br>Dockerfile由多条指令构成，随着深入研究Dockerfile与镜像的关系，很快大家就会发现，Dockerfile中的每一条指令都会对应于Docker镜像中的一层。</p>
+<p>继续以如下Dockerfile为例：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">FROM</span> <span class="string">ubuntu:14.04</span></span><br><span class="line"><span class="string">ADD</span> <span class="string">run.sh</span> <span class="string">/</span></span><br><span class="line"><span class="string">VOLUME</span> <span class="string">/data</span></span><br><span class="line"><span class="string">CMD</span> <span class="string">["./run.sh"]</span></span><br></pre></td></tr></table></figure></div><div class="level is-mobile is-flex"><div class="level-start"><div class="is-uppercase article-more button is-small size-small"><i class="fas fa-tags has-text-grey"></i> <a class="link-muted mr-2" rel="tag" href="/tags/linux/">linux</a><a class="link-muted mr-2" rel="tag" href="/tags/centos/">centos</a><a class="link-muted mr-2" rel="tag" href="/tags/k8s/">k8s</a><a class="link-muted mr-2" rel="tag" href="/tags/%E5%AE%B9%E5%99%A8/">容器</a><a class="link-muted mr-2" rel="tag" href="/tags/docker/">docker</a><a class="link-muted mr-2" rel="tag" href="/tags/docker%E9%95%9C%E5%83%8F/">docker镜像</a></div></div><div class="level-start"><div class="level-item has-text-grey is-size-7 is-hidden-mobile"><time datetime="2020-04-16T13:04:25.944Z"><i class="far fa-calendar-check"> 最后修改: </i>2020-04-16</time></div></div><div class="level-start"><div class="level-item"><a class="article-more button is-small size-small link-muted" href="/2020/03/28/k8s/Docker-Image/#more"><i class="fas fa-book-reader has-text-grey"> </i>阅读更多&gt;&gt;</a></div></div></div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta size-small is-uppercase level is-mobile"><div class="level-left"><time class="level-item" dateTime="2020-03-27T14:06:07.000Z">2020-03-27</time><span class="level-item"><i class="fas fa-folder-open has-text-grey"> </i><a class="link-muted" href="/categories/k8s/">k8s</a></span><span class="level-item">9 分钟 读完 (大约 1354 个字)</span></div></div><h1 class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2020/03/27/k8s/K8S-Common-problem/">k8s常见问题解决</a></h1><div class="content"><h3 id="1-基础镜像制作规范和使用"><a href="#1-基础镜像制作规范和使用" class="headerlink" title="1.基础镜像制作规范和使用"></a><em>1.基础镜像制作规范和使用</em></h3><p>1.1 时区修改<br>官网下载centos镜像默认时区是国外的时区，需要把它修改成上海时区。运维提供提一个基础的镜像给业务部门下载使用。</p>
+<p>1.2 规范docker运行程序的用户<br>基于安全和规范的考虑，docker统一使用一个uid为1001的，用户名为pub的普通账号运行程序，需要在镜像和容器的宿主机上面同时新建。这个也是运维在初始化基础镜像和容器宿主机上面统一创建。</p>
+<p>1.3 规范每个容器的cpu和内存(每个容器分配1核2G内存,视情况而定)</p>
+<h3 id="2-镜像下载策略"><a href="#2-镜像下载策略" class="headerlink" title="2.镜像下载策略"></a><em>2.镜像下载策略</em></h3><p>2.1 默认的镜像拉取策略是“IfNotPresent”，在镜像已经存在的情况下，kubelet将不在去拉取镜像。 如果总是想要拉取镜像，必须设置拉取策略为“Always”或者设置镜像标签为“:latest”。</p>
+<p>如果没有指定镜像的标签，它会被假定为“:latest”,同时拉取策略为“Always”。</p>
+<h3 id="3-增加k8s各个命名空间的服务账号-default-的自定义权限-RABC"><a href="#3-增加k8s各个命名空间的服务账号-default-的自定义权限-RABC" class="headerlink" title="3.增加k8s各个命名空间的服务账号 default 的自定义权限(RABC)"></a><em>3.增加k8s各个命名空间的服务账号 default 的自定义权限(RABC)</em></h3><p>首先，了解下什么是RABC：</p>
+<p>基于角色的访问控制（Role-Based Access Control, 即”RBAC”）使用”rbac.authorization.k8s.io” API Group实现授权决策，允许管理员通过Kubernetes API动态配置策略。</p>
+<p>在RBAC API中，一个角色包含了一套表示一组权限的规则。 权限以纯粹的累加形式累积（没有”否定”的规则）。 角色可以由命名空间（namespace）内的Role对象定义，而整个Kubernetes集群范围内有效的角色则通过ClusterRole对象实现</p>
+<p>比如授予default命名空间的default ServiceAccount账号能够”get”, “watch”, “list”, “patch”   default 命名空间里面的pod资源</p>
+<p>3.1 定义role，一个Role对象只能用于授予对某一单一命名空间中资源的访问权限。 以下示例描述了”default”命名空间中的一个Role对象的定义，用于授予对pod的读访问权限：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">kind:</span> <span class="string">Role</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">rbac.authorization.k8s.io/v1beta1</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod-reader</span></span><br><span class="line"><span class="attr">rules:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">apiGroups:</span> <span class="string">[""]</span> <span class="comment"># 空字符串""表明使用core API group</span></span><br><span class="line">  <span class="attr">resources:</span> <span class="string">["pods"]</span></span><br><span class="line">  <span class="attr">verbs:</span> <span class="string">["get",</span> <span class="string">"watch"</span><span class="string">,</span> <span class="string">"list"</span><span class="string">,</span> <span class="string">"patch"</span><span class="string">]</span></span><br></pre></td></tr></table></figure></div><div class="level is-mobile is-flex"><div class="level-start"><div class="is-uppercase article-more button is-small size-small"><i class="fas fa-tags has-text-grey"></i> <a class="link-muted mr-2" rel="tag" href="/tags/linux/">linux</a><a class="link-muted mr-2" rel="tag" href="/tags/centos/">centos</a><a class="link-muted mr-2" rel="tag" href="/tags/k8s/">k8s</a><a class="link-muted mr-2" rel="tag" href="/tags/%E5%AE%B9%E5%99%A8/">容器</a><a class="link-muted mr-2" rel="tag" href="/tags/docker/">docker</a></div></div><div class="level-start"><div class="level-item has-text-grey is-size-7 is-hidden-mobile"><time datetime="2020-04-16T13:05:48.664Z"><i class="far fa-calendar-check"> 最后修改: </i>2020-04-16</time></div></div><div class="level-start"><div class="level-item"><a class="article-more button is-small size-small link-muted" href="/2020/03/27/k8s/K8S-Common-problem/#more"><i class="fas fa-book-reader has-text-grey"> </i>阅读更多&gt;&gt;</a></div></div></div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta size-small is-uppercase level is-mobile"><div class="level-left"><time class="level-item" dateTime="2020-03-26T15:30:07.000Z">2020-03-26</time><span class="level-item"><i class="fas fa-folder-open has-text-grey"> </i><a class="link-muted" href="/categories/k8s%E4%B8%93%E9%A2%98/">k8s专题</a></span><span class="level-item">6 分钟 读完 (大约 873 个字)</span></div></div><h1 class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2020/03/26/k8s/K8S-10-Use-Spinnaker-CICD/">k8s专题[10.使用Spinnaker持续发布应用]</a></h1><div class="content"><h3 id="本节介绍如何使用spinnaker的持续发布k8s的应用"><a href="#本节介绍如何使用spinnaker的持续发布k8s的应用" class="headerlink" title="本节介绍如何使用spinnaker的持续发布k8s的应用"></a>本节介绍如何使用spinnaker的持续发布k8s的应用</h3><p>1.首先使用spinnaker创建一个nginxdemo 的应用，再在nginxdemo应用里面创建 Pipeline。进入nginxdemo 详情页面，点击 “PIPELINES”，目前是没有任何信息的，点击 “+ Create”，弹框中选择类型为 Pipeline，输入流程名称，这里我命名为 nginxdemo-pipe。因为第一次创建，下边 “Copy From” 选择没出来，后续在创建时，我们也可以通过 “Copy From” 方式选择已存在的 Pipeline，非常方便就复制了一个一样配置的流程。创建完毕后，就会出现详细配置 Pipeline State 的页面了</p>
+<p><img src="https://cloud.qingye.info/images/20200326/spin1.png" alt="图1"></p>
+<p>2.配置 Configuration 项</p>
+<p>刚开始这里只有一个 Configuration 选项，可以配置 Automated Triggers、Parameters、Notifications 等，这里说下 Automated Triggers 和 Parameters 这两个非常有用，我们可以将此视为 Pipeline 启动前的一些初始化配置，比如启动需要的参数配置、自动触发配置等，为后续各阶段提供必要的信息。<br>Automated Triggers 自动触发，它提供 7 种类型的触发方式：</p>
 <ul>
-<li><p><strong>高可用性</strong></p></li></ul>
-        </div>
-        
-        
-        <div class="level is-mobile">
-            <div class="level-start">
-                <div class="level-item">
-                <a class="button is-size-7 is-light" href="/2020/02/25/glusterfs-one/#more">阅读更多</a>
-                </div>
-            </div>
-        </div>
-        
-        
-    </div>
-</div>
-
-
-
-
-
-
-
-
-    <div class="card">
-    
-    <div class="card-content article ">
-        
-        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
-            <div class="level-left">
-                <time class="level-item has-text-grey" datetime="2020-02-23T15:36:41.000Z">2020-02-23</time>
-                
-                <div class="level-item">
-                <a class="has-link-grey -link" href="/categories/ntp/">ntp</a>
-                </div>
-                
-                
-                <span class="level-item has-text-grey">
-                    
-                    
-                    22 分钟 读完 (大约 3325 个字)
-                </span>
-                
-                
-            </div>
-        </div>
-        
-        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
-            
-                <a class="has-link-black-ter" href="/2020/02/23/ntp-server/">ntp-server服务端部署和配置</a>
-            
-        </h1>
-        <div class="content">
-            <h3 id="1-前言"><a href="#1-前言" class="headerlink" title="1.前言"></a><em>1.前言</em></h3><p>Atomic Clock: 现在计算时间最准确的是使用 原子震荡周期 所计算的物理时钟(Atomic Clock),因此也被定义为标准时间(International Atomic Time)</p>
-<p>UTC(coordinated Universal Time): 协和标准时间 就是利用 Atomic Clock 为基准定义出来的正确时间（又称世界统一时间，世界标准时间，国际协调时间）。</p>
-<p>硬件时钟: 硬件时钟是指嵌在主板上的特殊的电路, 它的存在就是平时我们关机之后还可以计算时间的原因</p>
-<p>系统时钟: 就是操作系统的kernel所用来计算时间的时钟. 它从1970年1月1日00:00:00 UTC时间到目前为止秒数总和的值</p>
-<p>NTP（Network Time Protocol 网络时间协议）是一个用于同步计算机时钟的网络协议。它可以使计算机与其他服务器或时钟源进行时间同步，进行高精度的时间校正。</p>
-        </div>
-        
-        
-        <div class="level is-mobile">
-            <div class="level-start">
-                <div class="level-item">
-                <a class="button is-size-7 is-light" href="/2020/02/23/ntp-server/#more">阅读更多</a>
-                </div>
-            </div>
-        </div>
-        
-        
-    </div>
-</div>
-
-
-
-
-
-
-
-
-    <div class="card">
-    
-    <div class="card-content article ">
-        
-        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
-            <div class="level-left">
-                <time class="level-item has-text-grey" datetime="2020-01-14T15:15:45.000Z">2020-01-14</time>
-                
-                <div class="level-item">
-                <a class="has-link-grey -link" href="/categories/yum/">yum</a>
-                </div>
-                
-                
-                <span class="level-item has-text-grey">
-                    
-                    
-                    3 分钟 读完 (大约 490 个字)
-                </span>
-                
-                
-            </div>
-        </div>
-        
-        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
-            
-                <a class="has-link-black-ter" href="/2020/01/14/yum-source/">YUM源部署和使用</a>
-            
-        </h1>
-        <div class="content">
-            <h3 id="1-前言"><a href="#1-前言" class="headerlink" title="1.前言"></a><em>1.前言</em></h3><p>为什么需要内部yum源呢，有可能是业务内部的服务器对外是不通了，居于一些安全方面的考虑。内部yum源又有什么好处呢，第一，速度快；第二，内网可控，外网有问题也不影响内网包的下载和安装等。</p>
-<h3 id="2-部署"><a href="#2-部署" class="headerlink" title="2.部署"></a><em>2.部署</em></h3><h4 id="2-1-创建yum仓库目录"><a href="#2-1-创建yum仓库目录" class="headerlink" title="2.1 创建yum仓库目录"></a><em>2.1 创建yum仓库目录</em></h4><figure class="highlight bash hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /data/yum_data/centos/6/os/x86_64/</span><br><span class="line">mkdir -p /data/yum_data/centos/6/extras/x86_64/</span><br><span class="line">mkdir -p /data/yum_data/centos/6/updates/x86_64/</span><br><span class="line">mkdir -p /data/yum_data/epel/6/x86_64/</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-2-镜像同步公网yum源"><a href="#2-2-镜像同步公网yum源" class="headerlink" title="2.2 镜像同步公网yum源"></a><em>2.2 镜像同步公网yum源</em></h4><p>上游yum源必须要支持rsync协议，否则不能使用rsync进行同步<br>CentOS官方标准源：rsync://mirrors.ustc.edu.cn/centos/<br>epel源：rsync://mirrors.ustc.edu.cn/epel/<br>同步命令：</p>
-        </div>
-        
-        
-        <div class="level is-mobile">
-            <div class="level-start">
-                <div class="level-item">
-                <a class="button is-size-7 is-light" href="/2020/01/14/yum-source/#more">阅读更多</a>
-                </div>
-            </div>
-        </div>
-        
-        
-    </div>
-</div>
-
-
-
-
-
-
-
-
-    <div class="card">
-    
-    <div class="card-content article ">
-        
-        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
-            <div class="level-left">
-                <time class="level-item has-text-grey" datetime="2020-01-14T14:37:30.000Z">2020-01-14</time>
-                
-                <div class="level-item">
-                <a class="has-link-grey -link" href="/categories/rkhunter/">rkhunter</a>
-                </div>
-                
-                
-                <span class="level-item has-text-grey">
-                    
-                    
-                    2 分钟 读完 (大约 238 个字)
-                </span>
-                
-                
-            </div>
-        </div>
-        
-        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
-            
-                <a class="has-link-black-ter" href="/2020/01/14/rkhunter/">rkhunter安装和使用</a>
-            
-        </h1>
-        <div class="content">
-            <h3 id="1-前言"><a href="#1-前言" class="headerlink" title="1.前言"></a><em>1.前言</em></h3><ul>
-<li>rkhunter 是一个内核级别的rootkit检测工具,下面以rkhunter-1.4.2介绍一下安装和使用</li>
+<li>CRON：调度触发，可以执行一个 cron 调度任务来定时任务触发该流程。</li>
+<li>Git：当执行 Git push 操作时，触发该流程</li>
+<li>Jenkins：监听 Jenkins 的某一个 Job</li>
+<li>Travis：监听 Travis 的某一个 Job</li>
+<li>Pipeline：监听另一个 Pipeline 执行</li>
+<li>Pub/Sub：当接受到 pubsub 消息时触发</li>
+<li>Docker Registry：当 image 更新时触发。</li>
 </ul>
-<h3 id="2-安装"><a href="#2-安装" class="headerlink" title="2.安装"></a><em>2.安装</em></h3>
-        </div>
-        
-        
-        <div class="level is-mobile">
-            <div class="level-start">
-                <div class="level-item">
-                <a class="button is-size-7 is-light" href="/2020/01/14/rkhunter/#more">阅读更多</a>
-                </div>
-            </div>
-        </div>
-        
-        
-    </div>
-</div>
-
-
-
-
-
-
-
-
-    <div class="card">
-    
-    <div class="card-content article ">
-        
-        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
-            <div class="level-left">
-                <time class="level-item has-text-grey" datetime="2020-01-12T07:52:25.000Z">2020-01-12</time>
-                
-                <div class="level-item">
-                <a class="has-link-grey -link" href="/categories/Tengine/">Tengine</a>
-                </div>
-                
-                
-                <span class="level-item has-text-grey">
-                    
-                    
-                    1 小时 读完 (大约 12590 个字)
-                </span>
-                
-                
-            </div>
-        </div>
-        
-        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
-            
-                <a class="has-link-black-ter" href="/2020/01/12/tenginx/">Tengine 基础原理和基本使用</a>
-            
-        </h1>
-        <div class="content">
-            <p><a href="#1tengine简介"><em>1.Tengine简介</em></a><br><a href="#2tengine特性"><em>2.Tengine特性</em></a><br><a href="#3tengine工作原理和用途"><em>3.Tengine工作原理和用途</em></a><br>    - <a href="#31-tengine处理http请求流程"><em>3.1 Tengine处理HTTP请求流程</em></a><br>    - <a href="#32-tengine的模块化"><em>3.2 Tengine的模块化</em></a><br>    - <a href="#33-tengine进程模型"><em>3.3 Tengine进程模型</em></a><br>    - <a href="#34-tengine事件模型"><em>3.4 Tengine事件模型</em></a><br>    - <a href="#35-tengine信号"><em>3.5 Tengine信号</em></a><br>    - <a href="#36-tengine定时器"><em>3.6 Tengine定时器</em></a><br><a href="#4tengine安装部署"><em>4.Tengine安装部署</em></a><br>    - <a href="#41-安装依赖"><em>4.1 安装依赖</em></a><br>    - <a href="#42-编译"><em>4.2 编译</em></a><br><a href="#5tengine-文件目录结构"><em>5.Tengine 文件目录结构</em></a><br><a href="#6tengine-配置文件详解"><em>6.Tengine 配置文件详解</em></a><br>    - <a href="#61-tengine主配置文件"><em>6.1 tengine主配置文件</em></a><br>    - <a href="#62-状态检测配置文件"><em>6.2 状态检测配置文件</em></a><br>    - <a href="#63-tengine常用配置"><em>6.3 tengine常用配置</em></a><br><a href="#7tengine-安全防护"><em>7.Tengine 安全防护</em></a><br>    - <a href="#71-禁止web服务ip直接访问"><em>7.1 禁止web服务IP直接访问</em></a><br>    - <a href="#72-连接和请求数限制"><em>7.2 连接和请求数限制</em></a><br>    - <a href="#73-访问全站ip黑名单限制"><em>7.3 访问全站IP黑名单限制</em></a><br>    - <a href="#74-下载防盗链配置"><em>7.4 下载防盗链配置</em></a><br><a href="#8tengine-重要模块"><em>8.Tengine 重要模块</em></a><br>    - <a href="#81-upstream负载均衡模块"><em>8.1 upstream负载均衡模块</em></a><br>    - <a href="#82-rewrite重写模块"><em>8.2 rewrite重写模块</em></a><br><a href="#9location-在匹配中的优先级"><em>9.location 在匹配中的优先级</em></a><br><a href="#10tengine-root-和-alias-的区别"><em>10.Tengine root 和 alias 的区别</em></a><br><a href="#11tengine-tcp转发配置"><em>11.Tengine TCP转发配置</em></a><br><a href="#12tengine-常用维护脚本或命令"><em>12.Tengine 常用维护脚本或命令</em></a><br><a href="#13参考文档"><em>13.参考文档</em></a></p>
-<h3 id="1-Tengine简介"><a href="#1-Tengine简介" class="headerlink" title="1.Tengine简介"></a><em>1.Tengine简介</em></h3><p><em>Tengine是由淘宝网发起的Web服务器项目。它在Nginx的基础上，针对大访问量网站的需求，添加了很多高级功能和特性。Tengine的性能和稳定性已经在大型的网站如淘宝网，天猫商城等得到了很好的检验。它的最终目标是打造一个高效、稳定、安全、易用的Web平台。从2011年12月开始，Tengine成为一个开源项目，Tengine团队在积极地开发和维护着它。Tengine团队的核心成员来自于淘宝、搜狗等互联网企业。Tengine是社区合作的成果，我们欢迎大家参与其中，贡献自己的力量。</em></p>
-<h3 id="2-Tengine特性"><a href="#2-Tengine特性" class="headerlink" title="2.Tengine特性"></a><em>2.Tengine特性</em></h3>
-        </div>
-        
-        
-        <div class="level is-mobile">
-            <div class="level-start">
-                <div class="level-item">
-                <a class="button is-size-7 is-light" href="/2020/01/12/tenginx/#more">阅读更多</a>
-                </div>
-            </div>
-        </div>
-        
-        
-    </div>
-</div>
-
-
-
-
-
-
-
-
-    <div class="card">
-    
-    <div class="card-content article ">
-        
-        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
-            <div class="level-left">
-                <time class="level-item has-text-grey" datetime="2019-11-05T15:26:42.000Z">2019-11-05</time>
-                
-                <div class="level-item">
-                <a class="has-link-grey -link" href="/categories/Tengine/">Tengine</a>
-                </div>
-                
-                
-                <span class="level-item has-text-grey">
-                    
-                    
-                    7 分钟 读完 (大约 1078 个字)
-                </span>
-                
-                
-            </div>
-        </div>
-        
-        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
-            
-                <a class="has-link-black-ter" href="/2019/11/05/tengine-http2/">Centos6 Tengine开启http2传输协议</a>
-            
-        </h1>
-        <div class="content">
-            <h3 id="1-前言"><a href="#1-前言" class="headerlink" title="1.前言"></a><em>1.前言</em></h3><p><em>最近在优化网站的访问速度，为网站开启http2协议，这个协议有什么优点呢？如下：</em></p>
-<ul>
-<li><p>http2是下一代的传输协议，以后都会普遍用它，是一个趋势。</p>
-</li>
-<li><p>http2有多路复用特性，意思是访问一个域名下面的资源，多个请求共用一条TCP链路，所以比http1.1要快得多。</p>
-</li>
+<p>基本能满足我们日常持续集成或交付的需求，当然每一个类型都需要配置相应的参数，比如 Cron 类型，需要配置执行频率、启动时间等。下图我们选择Docker Registry作为触发类型</p></div><div class="level is-mobile is-flex"><div class="level-start"><div class="is-uppercase article-more button is-small size-small"><i class="fas fa-tags has-text-grey"></i> <a class="link-muted mr-2" rel="tag" href="/tags/linux/">linux</a><a class="link-muted mr-2" rel="tag" href="/tags/centos/">centos</a><a class="link-muted mr-2" rel="tag" href="/tags/k8s/">k8s</a><a class="link-muted mr-2" rel="tag" href="/tags/%E5%AE%B9%E5%99%A8/">容器</a><a class="link-muted mr-2" rel="tag" href="/tags/docker/">docker</a><a class="link-muted mr-2" rel="tag" href="/tags/spinnaker/">spinnaker</a></div></div><div class="level-start"><div class="level-item has-text-grey is-size-7 is-hidden-mobile"><time datetime="2020-04-16T13:13:13.324Z"><i class="far fa-calendar-check"> 最后修改: </i>2020-04-16</time></div></div><div class="level-start"><div class="level-item"><a class="article-more button is-small size-small link-muted" href="/2020/03/26/k8s/K8S-10-Use-Spinnaker-CICD/#more"><i class="fas fa-book-reader has-text-grey"> </i>阅读更多&gt;&gt;</a></div></div></div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta size-small is-uppercase level is-mobile"><div class="level-left"><time class="level-item" dateTime="2020-03-26T15:07:07.000Z">2020-03-26</time><span class="level-item"><i class="fas fa-folder-open has-text-grey"> </i><a class="link-muted" href="/categories/k8s%E4%B8%93%E9%A2%98/">k8s专题</a></span><span class="level-item">1 分钟 读完 (大约 191 个字)</span></div></div><h1 class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2020/03/26/k8s/K8S-9-Jenkins-Spinnaker-CICD/">k8s专题[9.基于Jenkins和Spinnaker的CI/CD流程]</a></h1><div class="content"><h3 id="流程图"><a href="#流程图" class="headerlink" title="流程图"></a>流程图</h3><p><img src="https://cloud.qingye.info/images/20200326/kubernetes-jenkins-spinnaker-ci-cd.png" alt="基于Jenkins和Spinnaker的CI/CD流程"></p>
+<p>流程说明:<br>1.用户向Gitlab提交代码，代码中包含Dockerfile<br>2.将代码提交到远程仓库<br>3.Gitlab提交触发Jenkins自动构建<br>4.Jenkins的CI流水线自动编译代码并打包成docker镜像推送到Harbor镜像仓库<br>5.更新Ingress的配置，根据新部署的应用的名称，在ingress的配置文件中增加一条路由信息(不是新业务不用更改此配置)<br>6.Jenkins构建完成可触发Spinnaker的自动发布流程，或者手动触发spinnaker发布。<br>7.Spinnaker会根据发布流程更新kubernetes YAML配置文件<br>8.Spinnaker调用kubernetes的API，部署应用</p>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta size-small is-uppercase level is-mobile"><div class="level-left"><time class="level-item" dateTime="2020-03-26T14:07:07.000Z">2020-03-26</time><span class="level-item"><i class="fas fa-folder-open has-text-grey"> </i><a class="link-muted" href="/categories/k8s%E4%B8%93%E9%A2%98/">k8s专题</a></span><span class="level-item">9 分钟 读完 (大约 1288 个字)</span></div></div><h1 class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2020/03/26/k8s/K8S-8-spinnaker/">k8s专题[8.spinnaker基本介绍]</a></h1><div class="content"><h3 id="1-概念"><a href="#1-概念" class="headerlink" title="1.概念"></a><em>1.概念</em></h3><p>Spinnaker 是 Netflix 的开源项目，是一个持续交付平台，它定位于将产品快速且持续的部署到多种云平台上。Spinnaker 通过将发布和各个云平台解耦，来将部署流程流水线化，从而降低平台迁移或多云品台部署应用的复杂度，它本身内部支持 Google、AWS EC2、Microsoft Azure、Kubernetes和OpenStack 等云平台，并且它可以无缝集成其他持续集成（CI）流程，如 git、Jenkins、Travis CI、Docker registry、cron 调度器等。简而言之，Spinnaker是致力于提供在多种平台上实现开箱即用的集群管理和部署功能的平台。</p>
+<h3 id="2-功能"><a href="#2-功能" class="headerlink" title="2.功能"></a><em>2.功能</em></h3><h4 id="2-1：集群管理主要用于管理云上的资源，它分为以下几个块"><a href="#2-1：集群管理主要用于管理云上的资源，它分为以下几个块" class="headerlink" title="2.1：集群管理主要用于管理云上的资源，它分为以下几个块"></a>2.1：集群管理主要用于管理云上的资源，它分为以下几个块</h4><ul>
+<li>Server Group：服务组，是资源管理单位，识别可部署组件和基础配置设置，它并且关联了一个负载均衡器和安全组，当部署完毕后，服务组就相当于一组运行中的软件实例集合，如（VM 实例，Kubernetes pods）。</li>
+<li>Cluster：集群，由用户定义的，对服务组的逻辑分组。</li>
+<li>Applications：应用，是对集群的逻辑分组。</li>
+<li>Load Balancer：负载均衡，用于将外部网络流量重定向到服务组中的机器实例，还可以指定一系列规则，用来对服务组中的机器实例做健康监测。</li>
+<li>Security Group：安全组，定义了网络访问权限，由IP、端口和通信协议组成的防火墙</li>
 </ul>
-<h3 id="2-准备工作"><a href="#2-准备工作" class="headerlink" title="2.准备工作"></a><em>2.准备工作</em></h3><ul>
-<li><p><em>需要重新编译openssl1.0.2以上版本，因为我们系统的版本都是centos6的，不支持直接yum更新openssl，如果是centos7，直接yum update openssl -y 即可更新</em></p>
-</li>
-<li><p>编译完成openssl后，需要重新使用openssl的库文件重新编译tengine，我们使用的Tengine版本是Tengine/2.2.2。</p>
-</li>
+<h4 id="2-2：部署管理功能用于创建一个持续交付流程，它可分为管道和阶段两大部分"><a href="#2-2：部署管理功能用于创建一个持续交付流程，它可分为管道和阶段两大部分" class="headerlink" title="2.2：部署管理功能用于创建一个持续交付流程，它可分为管道和阶段两大部分"></a>2.2：部署管理功能用于创建一个持续交付流程，它可分为管道和阶段两大部分</h4><ul>
+<li>管道 部署管理的核心是管道，在Spinnaker的定义中，管道由一系列的阶段（stages）组成。管道可以人工触发，也可以配置为自动触发，比如由 Jenkins Job 完成时、Docker Images 上传到仓库时，CRON 定时器、其他管道中的某一阶段。同时，管道可以配置参数和通知，可以在管道一些阶段上执行时发送邮件消息。Spinnaker 已经内置了一些阶段，如执行自定义脚本、触发 Jenkins 任务等。</li>
+<li>阶段 阶段在 Spinnaker 中，可以作为管道的一个自动构建模块的功能组成。我们可以随意在管道中定义各个阶段执行顺序。Spinnaker 提供了很多阶段供我们选择使用，比如执行发布（Deploy）、执行自定义脚本 (script)、触发 Jenkins 任务 (jenkins)等，功能很强大。</li>
+<li>部署策略 Spinnaker 支持精细的部署策略，比如 红/黑（蓝/绿）部署，多阶段环境部署，滚动红/黑策略，canary 发布等。用户可以为每个环境使用不同部署策略，比如，测试环境可以使用红/黑策略，生产环境使用滚动红/黑策略，它封装好了必须的步骤，用户不需要复杂操作，就可以实现企业级上线。</li>
 </ul>
-<h3 id="3-操作步骤"><a href="#3-操作步骤" class="headerlink" title="3.操作步骤"></a><em>3.操作步骤</em></h3>
-        </div>
-        
-        
-        <div class="level is-mobile">
-            <div class="level-start">
-                <div class="level-item">
-                <a class="button is-size-7 is-light" href="/2019/11/05/tengine-http2/#more">阅读更多</a>
-                </div>
-            </div>
-        </div>
-        
-        
-    </div>
-</div>
-
-
-
-
-
-
-
-
-</div>
-                
-
-
-
-
-<div class="column is-4-tablet is-3-desktop is-3-widescreen  has-order-1 column-left is-sticky">
-    
-        
-<div class="card widget">
-    <div class="card-content">
-        <nav class="level">
-            <div class="level-item has-text-centered">
-                <div>
-                    
-                        <img id="blog-head-img" class="image is-128x128 has-mb-6" src="/images/avatar.png" alt="青叶的博客">
-                    
-                    
-                    <p class="is-size-5 is-block" style="margin-top: 10px;">
-                        青叶的博客
-                    </p>
-                    
-                    
-                    <p class="is-size-6 is-block" style="margin-top: 5px;">
-                        Do Something...
-                    </p>
-                    
-                    
-                    <p class="is-size-6 is-flex is-flex-center has-text-grey" style="margin-top: 5px;">
-                        <i class="fas fa-map-marker-alt has-mr-7"></i>
-                        <span>&nbsp;&nbsp;广东 . 深圳</span>
-                    </p>
-                    
-                </div>
-            </div>
-        </nav>
-        <nav class="level is-mobile">
-            <div class="level-item has-text-centered is-marginless">
-                <div>
-                    <p class="heading">
-                        文章
-                    </p>
-                    <p class="title has-text-weight-normal">
-                        7
-                    </p>
-                </div>
-            </div>
-            <div class="level-item has-text-centered is-marginless">
-                <div>
-                    <p class="heading">
-                        分类
-                    </p>
-                    <p class="title has-text-weight-normal">
-                        5
-                    </p>
-                </div>
-            </div>
-            <div class="level-item has-text-centered is-marginless">
-                <div>
-                    <p class="heading">
-                        标签
-                    </p>
-                    <p class="title has-text-weight-normal">
-                        11
-                    </p>
-                </div>
-            </div>
-        </nav>
-        <div id="knowledge-star">
-            <div class="level">
-                <a class="level-item button is-link is-rounded" href="http://cloud.qingye.info/images/20191105/weixinggongzhonghao.png" target="_blank">
-                    关注博主微信公众号</a>
-            </div>
-            <div clas="level" id="knowledge-qrcode" style="display:none;">
-                    <img src="/images/zhishixingqiu.png"/>
-            </div>
-        </div>
-        
-        
-        <div class="level is-mobile">
-            
-            <a class="level-item button is-white is-marginless" target="_blank"
-                title="Github" href="https://github.com/qingyeinfo">
-                
-                <i class="fab fa-github"></i>
-                
-            </a>
-            
-            <a class="level-item button is-white is-marginless" target="_blank"
-                title="Email" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&amp;email=qingyeinfo@gmail.com">
-                
-                <i class="fa fa-envelope"></i>
-                
-            </a>
-            
-            <a class="level-item button is-white is-marginless" target="_blank"
-                title="RSS" href="/atom.xml">
-                
-                <i class="fas fa-rss"></i>
-                
-            </a>
-            
-        </div>
-        
-    </div>
-</div>
-    
-        
-    
-        
-<div class="card widget">
-    <div class="card-content">
-        <h3 class="menu-label">
-            最新文章
-        </h3>
-        
-        <article class="media">
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-02-28T14:51:30.000Z">2020-02-28</time></div>
-                    <a href="/2020/02/28/glusterfs-two/" class="has-link-black-ter is-size-6">GlusterFS集群文件系统专题二(主要术语)</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/glusterfs/">glusterfs</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
-        <article class="media">
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-02-25T15:20:56.000Z">2020-02-25</time></div>
-                    <a href="/2020/02/25/glusterfs-one/" class="has-link-black-ter is-size-6">GlusterFS集群文件系统专题一(基础原理)</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/glusterfs/">glusterfs</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
-        <article class="media">
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-02-23T15:36:41.000Z">2020-02-23</time></div>
-                    <a href="/2020/02/23/ntp-server/" class="has-link-black-ter is-size-6">ntp-server服务端部署和配置</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/ntp/">ntp</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
-        <article class="media">
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-01-14T15:15:45.000Z">2020-01-14</time></div>
-                    <a href="/2020/01/14/yum-source/" class="has-link-black-ter is-size-6">YUM源部署和使用</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/yum/">yum</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
-        <article class="media">
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-01-14T14:37:30.000Z">2020-01-14</time></div>
-                    <a href="/2020/01/14/rkhunter/" class="has-link-black-ter is-size-6">rkhunter安装和使用</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/rkhunter/">rkhunter</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
-    </div>
-</div>
-
-    
-        <div class="card widget">
-    <div class="card-content">
-        <div class="menu">
-        <h3 class="menu-label">
-            归档
-        </h3>
-        <ul class="menu-list">
-        
-        <li>
-            <a class="level is-marginless" href="/archives/2020/02/">
-                <span class="level-start">
-                    <span class="level-item">二月 2020</span>
-                </span>
-                <span class="level-end">
-                    <span class="level-item tag">3</span>
-                </span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="level is-marginless" href="/archives/2020/01/">
-                <span class="level-start">
-                    <span class="level-item">一月 2020</span>
-                </span>
-                <span class="level-end">
-                    <span class="level-item tag">3</span>
-                </span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="level is-marginless" href="/archives/2019/11/">
-                <span class="level-start">
-                    <span class="level-item">十一月 2019</span>
-                </span>
-                <span class="level-end">
-                    <span class="level-item tag">1</span>
-                </span>
-            </a>
-        </li>
-        
-        </ul>
-        </div>
-    </div>
-</div>
-    
-        
-<div class="card widget">
-    <div class="card-content">
-        <div class="menu">
-            <h3 class="menu-label">
-                分类
-            </h3>
-            <ul class="menu-list">
-            <li>
-        <a class="level is-marginless" href="/categories/Tengine/">
-            <span class="level-start">
-                <span class="level-item">Tengine</span>
-            </span>
-            <span class="level-end">
-                <span class="level-item tag">2</span>
-            </span>
-        </a></li><li>
-        <a class="level is-marginless" href="/categories/glusterfs/">
-            <span class="level-start">
-                <span class="level-item">glusterfs</span>
-            </span>
-            <span class="level-end">
-                <span class="level-item tag">2</span>
-            </span>
-        </a></li><li>
-        <a class="level is-marginless" href="/categories/ntp/">
-            <span class="level-start">
-                <span class="level-item">ntp</span>
-            </span>
-            <span class="level-end">
-                <span class="level-item tag">1</span>
-            </span>
-        </a></li><li>
-        <a class="level is-marginless" href="/categories/rkhunter/">
-            <span class="level-start">
-                <span class="level-item">rkhunter</span>
-            </span>
-            <span class="level-end">
-                <span class="level-item tag">1</span>
-            </span>
-        </a></li><li>
-        <a class="level is-marginless" href="/categories/yum/">
-            <span class="level-start">
-                <span class="level-item">yum</span>
-            </span>
-            <span class="level-end">
-                <span class="level-item tag">1</span>
-            </span>
-        </a></li>
-            </ul>
-        </div>
-    </div>
-</div>
-    
-        
-<div class="card widget">
-    <div class="card-content">
-        <h3 class="menu-label">
-            标签云
-        </h3>
-        <a href="/tags/centos/" style="font-size: 16.67px;">centos</a> <a href="/tags/glusterfs/" style="font-size: 13.33px;">glusterfs</a> <a href="/tags/http2/" style="font-size: 10px;">http2</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/nginx/" style="font-size: 13.33px;">nginx</a> <a href="/tags/ntp/" style="font-size: 10px;">ntp</a> <a href="/tags/openssl/" style="font-size: 10px;">openssl</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/tengine/" style="font-size: 13.33px;">tengine</a> <a href="/tags/yum%E6%BA%90/" style="font-size: 10px;">yum源</a>
-    </div>
-</div>
-
-    
-        <div class="card widget">
-    <div class="card-content">
-        <div class="menu">
-            <h3 class="menu-label">
-                标签
-            </h3>
-            <div class="field is-grouped is-grouped-multiline">
-                
-                <div class="control">
-                    <a class="tags has-addons" href="/tags/centos/">
-                        <span class="tag">centos</span>
-                        <span class="tag is-grey">4</span>
-                    </a>
-                </div>
-                
-                <div class="control">
-                    <a class="tags has-addons" href="/tags/glusterfs/">
-                        <span class="tag">glusterfs</span>
-                        <span class="tag is-grey">2</span>
-                    </a>
-                </div>
-                
-                <div class="control">
-                    <a class="tags has-addons" href="/tags/http2/">
-                        <span class="tag">http2</span>
-                        <span class="tag is-grey">1</span>
-                    </a>
-                </div>
-                
-                <div class="control">
-                    <a class="tags has-addons" href="/tags/https/">
-                        <span class="tag">https</span>
-                        <span class="tag is-grey">1</span>
-                    </a>
-                </div>
-                
-                <div class="control">
-                    <a class="tags has-addons" href="/tags/linux/">
-                        <span class="tag">linux</span>
-                        <span class="tag is-grey">7</span>
-                    </a>
-                </div>
-                
-                <div class="control">
-                    <a class="tags has-addons" href="/tags/nginx/">
-                        <span class="tag">nginx</span>
-                        <span class="tag is-grey">2</span>
-                    </a>
-                </div>
-                
-                <div class="control">
-                    <a class="tags has-addons" href="/tags/ntp/">
-                        <span class="tag">ntp</span>
-                        <span class="tag is-grey">1</span>
-                    </a>
-                </div>
-                
-                <div class="control">
-                    <a class="tags has-addons" href="/tags/openssl/">
-                        <span class="tag">openssl</span>
-                        <span class="tag is-grey">1</span>
-                    </a>
-                </div>
-                
-                <div class="control">
-                    <a class="tags has-addons" href="/tags/shell/">
-                        <span class="tag">shell</span>
-                        <span class="tag is-grey">1</span>
-                    </a>
-                </div>
-                
-                <div class="control">
-                    <a class="tags has-addons" href="/tags/tengine/">
-                        <span class="tag">tengine</span>
-                        <span class="tag is-grey">2</span>
-                    </a>
-                </div>
-                
-                <div class="control">
-                    <a class="tags has-addons" href="/tags/yum%E6%BA%90/">
-                        <span class="tag">yum源</span>
-                        <span class="tag is-grey">1</span>
-                    </a>
-                </div>
-                
-            </div>
-        </div>
-    </div>
-</div>
-    
-    
-        <div class="column-right-shadow is-hidden-widescreen is-sticky">
-        
-        </div>
-    
-</div>
-
-                
-                
-                
-            </div>
-        </div>
-    </section>
-    <footer class="footer">
-    <div class="container">
-        <div class="level">
-            <div class="level-start has-text-centered-mobile">
-                <a class="footer-logo is-block has-mb-6" href="/">
-                
-                    <img src="/images/logo.svg" alt="qingye&#39;s blog" height="28">
-                
-                </a>
-                <p class="is-size-7">
-                &copy; 2020 青叶&nbsp;
-                <a href="http://www.beian.miit.gov.cn" target="_blank">粤ICP备19143656号-1</a>
-                Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> & <a
-                        href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank">Icarus</a>
-                        <br>
-                        <span><i class="fa fa-bug" aria-hidden="true"></i> Websit Spider <a href="http://qingye.info/baidusitemap.xml">Baidu Sitmap</a>  and  <a href="http://qingye.info/sitemap.xml">Google Sitmap</a></span>
-                
-                <br>
-                <span id="busuanzi_container_site_uv">
-                共<span id="busuanzi_value_site_uv">0</span>个访客
-                </span>
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                </p>
-            </div>
-            <div class="level-end">
-            
-                <div class="field has-addons is-flex-center-mobile has-mt-5-mobile is-flex-wrap is-flex-middle">
-                
-                
-                <p class="control">
-                    <a class="button is-white is-large" target="_blank" title="Creative Commons" href="https://creativecommons.org/">
-                        
-                        <i class="fab fa-creative-commons"></i>
-                        
-                    </a>
-                </p>
-                
-                <p class="control">
-                    <a class="button is-white is-large" target="_blank" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/">
-                        
-                        <i class="fab fa-creative-commons-by"></i>
-                        
-                    </a>
-                </p>
-                
-                <p class="control">
-                    <a class="button is-white is-large" target="_blank" title="Download on GitHub" href="https://github.com/qingyeinfo">
-                        
-                        <i class="fab fa-github"></i>
-                        
-                    </a>
-                </p>
-                
-                </div>
-            
-            </div>
-        </div>
-    </div>
-</footer>
-    <script src="https://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
-<script src="https://unpkg.com/moment@2.22.2/min/moment-with-locales.min.js"></script>
-<script>moment.locale("zh-CN");</script>
-
-
-    
-    
-    
-    <script src="/js/animation.js"></script>
-    
-
-    
-    
-    
-    <script src="https://unpkg.com/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script>
-    <script src="https://unpkg.com/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script>
-    <script src="/js/gallery.js" defer></script>
-    
-
-    
-    
-
-<div id="outdated">
-    <h6>Your browser is out-of-date!</h6>
-    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/" target="_blank" rel="noopener">Update
-            my browser now </a></p>
-    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
-</div>
-<script src="https://unpkg.com/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.js" defer></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        outdatedBrowser({
-            bgColor: '#f25648',
-            color: '#ffffff',
-            lowerThan: 'flex'
-        });
-    });
-</script>
-
-
-    
-    
-    
-    
-
-<a id="back-to-top" title="回到顶端" href="javascript:;" target="_blank" rel="noopener">
-    <i class="fas fa-chevron-up"></i>
-</a>
-<script src="/js/back-to-top.js" defer></script>
-
-
-    
-    
-
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    <script src="https://unpkg.com/clipboard@2.0.4/dist/clipboard.min.js" defer></script>
-    <script src="/js/clipboard.js" defer></script>
-    
-
-    
-    
-    
-
-    
-    
-    
-
-    
-    
-    
-
-    
-    
-    
-
-    
-
-
-<script src="/js/main.js" defer></script>
-<script>
-    $(function(){
-        var showing = false;
-        var headEnter = false;
-        var mouseArea =  $("#knowledge-star");
-        var qrcode = $("#knowledge-qrcode");
-        var headimg = $("#blog-head-img");
-        //var originalSrc = headimg.attr("src");
-
-        function knowStarAnim(show){
-            if(show === showing) return;
-            showing = show;
-            qrcode.stop();
-            qrcode.toggle(1000);
-        }
-
-        mouseArea.mouseenter(function(){
-            knowStarAnim(true);  
-        });
-
-        mouseArea.mouseleave(function(){
-            knowStarAnim(false);
-        });
-
-        function headChangeAnim(enter){
-            if(enter === headEnter) return;
-            headEnter = enter;
-            if(enter){
-                $("img").attr("title", function() { return this.src });
-                $("img").attr("src", function(){
-                    if(this.width < 150){
-                        return "http://localhost:4000/images/avatar.png";
-                    }else{
-                        return this.src;
-                    }
-                })
-            }else{
-                $("img").attr("src", function() { return this.title });
-                $("img").removeAttr("title");
-            }
-        }
-
-        headimg.mouseenter(function(){
-            headChangeAnim(true);
-        });
-        headimg.mouseleave(function(){
-            headChangeAnim(false);
-        });
-    });
-</script>
-
-    
-    <div class="searchbox ins-search">
-    <div class="searchbox-container ins-search-container">
-        <div class="searchbox-input-wrapper">
-            <input type="text" class="searchbox-input ins-search-input" placeholder="想要查找什么..." />
-            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
-        </div>
-        <div class="searchbox-result-wrapper ins-section-wrapper">
-            <div class="ins-section-container"></div>
-        </div>
-    </div>
-</div>
-<script>
-    (function (window) {
-        var INSIGHT_CONFIG = {
-            TRANSLATION: {
-                POSTS: '文章',
-                PAGES: '页面',
-                CATEGORIES: '分类',
-                TAGS: '标签',
-                UNTITLED: '(无标题)',
+<h3 id="3-Spinnaker-架构所依赖的各个组件"><a href="#3-Spinnaker-架构所依赖的各个组件" class="headerlink" title="3.Spinnaker 架构所依赖的各个组件"></a><em>3.Spinnaker 架构所依赖的各个组件</em></h3></div><div class="level is-mobile is-flex"><div class="level-start"><div class="is-uppercase article-more button is-small size-small"><i class="fas fa-tags has-text-grey"></i> <a class="link-muted mr-2" rel="tag" href="/tags/linux/">linux</a><a class="link-muted mr-2" rel="tag" href="/tags/centos/">centos</a><a class="link-muted mr-2" rel="tag" href="/tags/k8s/">k8s</a><a class="link-muted mr-2" rel="tag" href="/tags/%E5%AE%B9%E5%99%A8/">容器</a><a class="link-muted mr-2" rel="tag" href="/tags/docker/">docker</a><a class="link-muted mr-2" rel="tag" href="/tags/spinnaker/">spinnaker</a></div></div><div class="level-start"><div class="level-item has-text-grey is-size-7 is-hidden-mobile"><time datetime="2020-04-16T13:11:58.547Z"><i class="far fa-calendar-check"> 最后修改: </i>2020-04-16</time></div></div><div class="level-start"><div class="level-item"><a class="article-more button is-small size-small link-muted" href="/2020/03/26/k8s/K8S-8-spinnaker/#more"><i class="fas fa-book-reader has-text-grey"> </i>阅读更多&gt;&gt;</a></div></div></div></article></div><nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination"><div class="pagination-previous is-invisible is-hidden-mobile"><a href="/page/0/">上一页</a></div><div class="pagination-next"><a href="/page/2/">下一页</a></div><ul class="pagination-list is-hidden-mobile"><li><a class="pagination-link is-current" href="/">1</a></li><li><a class="pagination-link" href="/page/2/">2</a></li><li><a class="pagination-link" href="/page/3/">3</a></li></ul></nav></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1 is-sticky"><!--!--><div class="card widget"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="is-rounded" src="https://cloud.qingye.info/images/avatar.jpg" alt="青叶"></figure><p class="title is-size-4 is-block line-height-inherit">青叶</p><p class="is-size-6 is-block">Do Something…</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>Tokyo</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives"><p class="title">25</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories"><p class="title">8</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags"><p class="title">23</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://cloud.qingye.info/images/qq_group.jpg" target="_blank" rel="noopener">点击加入技术讨论组</a></div><div class="level is-mobile"><a class="level-item button is-transparent is-white is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/qingyeinfo"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-white is-marginless" target="_blank" rel="noopener" title="Email" href="mailto:qingyeinfo@gmail.com"><i class="fa fa-envelope"></i></a><a class="level-item button is-transparent is-white is-marginless" target="_blank" rel="noopener" title="RSS" href="/atom.xml"><i class="fas fa-rss"></i></a></div><div><hr><p id="hitokoto">:D 一言句子获取中...</p><script type="text/javascript" defer>function getYiyan(){
+                                $.getJSON("https://v1.hitokoto.cn/", function (data) {
+                                if(data){
+                                    $('#hitokoto').html("");
+                                    $('#hitokoto').append("<strong style='color: #3273dc;'>"+data.hitokoto+"</strong>"+
+                                    "<p>"+"来源《"+data.from+"》</p><p>提供者-"+data.creator+"</p>");
+                                }});}
+                                $(function (){getYiyan();$('#hitokoto').click(function(){getYiyan();})});</script></div></div></div><!--!--><div class="card widget"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content size-small"><p><time dateTime="2020-03-30T15:40:07.000Z">2020-03-30</time></p><p class="title is-6"><a class="link-muted" href="/2020/03/30/k8s/K8S-LXCFS/">利用LXCFS提升容器资源可见性</a></p><p class="is-uppercase"><i class="fas fa-folder-open has-text-grey"> </i><a class="link-muted" href="/categories/k8s/">k8s</a></p></div></article><article class="media"><div class="media-content size-small"><p><time dateTime="2020-03-30T15:20:07.000Z">2020-03-30</time></p><p class="title is-6"><a class="link-muted" href="/2020/03/30/k8s/nginx-ingress-controller/">nginx-ingress-controller部署</a></p><p class="is-uppercase"><i class="fas fa-folder-open has-text-grey"> </i><a class="link-muted" href="/categories/k8s/">k8s</a></p></div></article><article class="media"><div class="media-content size-small"><p><time dateTime="2020-03-29T12:09:07.000Z">2020-03-29</time></p><p class="title is-6"><a class="link-muted" href="/2020/03/29/linux/Cross-domain-requests/">跨域请求以及实现跨域的方案</a></p><p class="is-uppercase"><i class="fas fa-folder-open has-text-grey"> </i><a class="link-muted" href="/categories/http/">http</a></p></div></article><article class="media"><div class="media-content size-small"><p><time dateTime="2020-03-29T11:40:07.000Z">2020-03-29</time></p><p class="title is-6"><a class="link-muted" href="/2020/03/29/linux/restful-api/">RESTful API 了解</a></p><p class="is-uppercase"><i class="fas fa-folder-open has-text-grey"> </i><a class="link-muted" href="/categories/http/">http</a></p></div></article><article class="media"><div class="media-content size-small"><p><time dateTime="2020-03-29T11:12:07.000Z">2020-03-29</time></p><p class="title is-6"><a class="link-muted" href="/2020/03/29/k8s/k8s-dubbo/">k8s+dubbo架构集群内外网络通讯解决方案</a></p><p class="is-uppercase"><i class="fas fa-folder-open has-text-grey"> </i><a class="link-muted" href="/categories/k8s/">k8s</a></p></div></article></div></div><div class="card widget"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile is-marginless" href="/categories/Tengine/"><span class="level-start"><span class="level-item">Tengine</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile is-marginless" href="/categories/glusterfs/"><span class="level-start"><span class="level-item">glusterfs</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile is-marginless" href="/categories/http/"><span class="level-start"><span class="level-item">http</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile is-marginless" href="/categories/k8s/"><span class="level-start"><span class="level-item">k8s</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile is-marginless" href="/categories/k8s%E4%B8%93%E9%A2%98/"><span class="level-start"><span class="level-item">k8s专题</span></span><span class="level-end"><span class="level-item tag">10</span></span></a></li><li><a class="level is-mobile is-marginless" href="/categories/ntp/"><span class="level-start"><span class="level-item">ntp</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/categories/rkhunter/"><span class="level-start"><span class="level-item">rkhunter</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/categories/yum/"><span class="level-start"><span class="level-item">yum</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile is-marginless" href="/archives/2020/03/"><span class="level-start"><span class="level-item">三月 2020</span></span><span class="level-end"><span class="level-item tag">18</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2020/02/"><span class="level-start"><span class="level-item">二月 2020</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2020/01/"><span class="level-start"><span class="level-item">一月 2020</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2019/11/"><span class="level-start"><span class="level-item">十一月 2019</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/linux/"><span class="tag">linux</span><span class="tag is-grey-lightest">25</span></a></div><div class="control"><a class="tags has-addons" href="/tags/centos/"><span class="tag">centos</span><span class="tag is-grey-lightest">22</span></a></div><div class="control"><a class="tags has-addons" href="/tags/docker/"><span class="tag">docker</span><span class="tag is-grey-lightest">16</span></a></div><div class="control"><a class="tags has-addons" href="/tags/k8s/"><span class="tag">k8s</span><span class="tag is-grey-lightest">16</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%AE%B9%E5%99%A8/"><span class="tag">容器</span><span class="tag is-grey-lightest">16</span></a></div><div class="control"><a class="tags has-addons" href="/tags/spinnaker/"><span class="tag">spinnaker</span><span class="tag is-grey-lightest">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/glusterfs/"><span class="tag">glusterfs</span><span class="tag is-grey-lightest">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/harbor/"><span class="tag">harbor</span><span class="tag is-grey-lightest">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/http/"><span class="tag">http</span><span class="tag is-grey-lightest">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/nginx/"><span class="tag">nginx</span><span class="tag is-grey-lightest">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/tengine/"><span class="tag">tengine</span><span class="tag is-grey-lightest">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E9%95%9C%E5%83%8F%E4%BB%93%E5%BA%93/"><span class="tag">镜像仓库</span><span class="tag is-grey-lightest">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Jenkins/"><span class="tag">Jenkins</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/RESTful-API/"><span class="tag">RESTful API</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/cross-domain/"><span class="tag">cross-domain</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/docker%E9%95%9C%E5%83%8F/"><span class="tag">docker镜像</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/http2/"><span class="tag">http2</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/https/"><span class="tag">https</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/ntp/"><span class="tag">ntp</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/openssl/"><span class="tag">openssl</span><span class="tag is-grey-lightest">1</span></a></div></div><div class="field is-grouped is-grouped-multiline"><a class="tags has-addons" href="/tags/"><span class="tag">查看全部&gt;&gt;</span></a></div></div></div></div><div class="card widget"><div class="card-content"><div class="menu"><h3 class="menu-label">订阅更新</h3><form action="https://feedburner.google.com/fb/a/mailverify" method="post" target="popupwindow" onsubmit="window.open(&#039;https://feedburner.google.com/fb/a/mailverify?uri=qingye/lhQA&#039;,&#039;popupwindow&#039;,&#039;scrollbars=yes,width=550,height=520&#039;);return true"><input type="hidden" value="qingye/lhQA" name="uri"><input type="hidden" name="loc" value="en_US"><div class="field has-addons"><div class="control has-icons-left is-expanded"><input class="input" name="email" type="email" placeholder="Email"><span class="icon is-small is-left"><i class="fas fa-envelope"></i></span></div><div class="control"><input class="button is-primary" type="submit" value="订阅"></div></div><p class="help">输入邮箱开始订阅，更博后邮件通知！</p></form></div></div></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="青叶の博客" height="28"></a><p class="size-small"><span>&copy; 2020 青叶</span>  Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank">Icarus</a>,Modify by <a href="https://github.com/qingyeinfo" target="_blank">qingyeinfo</a> <br>© 版权说明：[本网站所有内容均收集于互联网或自己创作,<br>    方便于网友与自己学习交流，如有侵权，请<a href="/message" target="_blank">留言</a>，立即处理]<br><script type="text/javascript" src="https://www.qingye.info/js/statistics.js"></script><span id="statistic-times">网站运行时间统计加载中...</span><br><div class="size-small">❤️感谢<span id="busuanzi_container_site_uv"><strong> <span id="busuanzi_value_site_uv">99+</span> </strong></span>小伙伴的<strong> <span id="busuanzi_value_site_pv">99+</span> </strong>次光临！❤️</div></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/qingyeinfo"><i class="fab fa-github"></i></a></p></div></div><div class="sideMusic"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script><meting-js style="width: auto;height: 2000px;" server="netease" type="playlist" id="2364053447" theme="#2980b9" loop="all" autoplay="false" order="list" storageName="aplayer-setting" lrctype="0" list-max-height="400px" fixed="true"></meting-js></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script>moment.locale("zh-CN");</script><script>var IcarusThemeSettings = {
+            site: {
+                url: 'http://qingye.info',
+                external_link: {"enable":true,"exclude":[]}
             },
-            CONTENT_URL: '/content.json',
-        };
-        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
-    })(window);
-</script>
-<script src="/js/insight.js" defer></script>
-<link rel="stylesheet" href="/css/search.css">
-<link rel="stylesheet" href="/css/insight.css">
-    
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/miku.model.json"},"display":{"position":"right","width":300,"height":600},"mobile":{"show":true},"react":{"opacity":0.7},"log":false});</script></body>
-</html>
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script src="https://www.qingye.info/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="https://www.qingye.info/js/back-to-top.js" defer></script><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script><script src="https://www.qingye.info/js/gallery.js" defer></script><!--!--><!--!--><!--!--><script src="https://www.qingye.info/js/main.js" defer></script><script src="https://www.qingye.info/js/comment-issue-data.js" defer></script><link rel="stylesheet" href="https://www.qingye.info/css/insight.css"><div class="searchbox ins-search"><div class="searchbox-container ins-search-container"><div class="searchbox-input-wrapper"><input class="searchbox-input ins-search-input" type="text" placeholder="想要查找什么..."><span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span></div><div class="searchbox-result-wrapper ins-section-wrapper"><div class="ins-section-container"></div></div></div></div><script>(function (window) {
+            var INSIGHT_CONFIG = {
+                TRANSLATION: {
+                    POSTS: '文章',
+                    PAGES: '页面',
+                    CATEGORIES: '分类',
+                    TAGS: '标签',
+                    UNTITLED: '(无标题)',
+                },
+                CONTENT_URL: 'https://www.qingye.info/content.json',
+            };
+            window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+        })(window);</script><script src="https://www.qingye.info/js/insight.js" defer></script><script type="text/javascript">var pjax = new Pjax({
+            elements: "a",//代表点击链接就更新
+            selectors: [  //代表要更新的节点
+                ".section",
+                "title"
+            ],
+            cache: false
+        })
+
+        function loadBusuanzi(){
+        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js", function () {});
+        }
+
+        // 开始 PJAX 执行的函数
+        document.addEventListener('pjax:send', function () {
+        });
+        
+        // PJAX 完成之后执行的函数，可以和上面的重载放在一起
+        document.addEventListener('pjax:complete', function () {
+            $(".section").css({opacity:1});
+            loadIssueData();
+            loadMathJax();
+            loadMainJs(jQuery, window.moment, window.ClipboardJS, window.IcarusThemeSettings);
+            loadGallery();
+            loadBackTop();
+            // loadSelfGitalk();
+            loadBusuanzi();
+            try{
+                loadEchart();
+            }catch (e) {
+                console.log("no echart");
+            }
+        });</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/miku.model.json"},"display":{"position":"right","width":300,"height":600},"mobile":{"show":true},"react":{"opacity":0.7},"log":false});</script></body></html>
